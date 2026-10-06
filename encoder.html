@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Code Translator</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(0, 180, 255, 0.10), transparent 30%),
+                radial-gradient(circle at 80% 80%, rgba(120, 0, 255, 0.10), transparent 30%),
+                #05070b;
+            color: #ffffff;
+            padding: 25px 15px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        /* HEADER */
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #111827, #172554);
+            border: 1px solid rgba(0, 200, 255, 0.35);
+            box-shadow: 0 0 35px rgba(0, 180, 255, 0.15);
+        }
+
+        h1 {
+            font-size: clamp(30px, 6vw, 52px);
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #ffffff, #6dd5ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            font-size: 16px;
+        }
+
+        /* MAIN CARD */
+
+        .main-card {
+            background: rgba(12, 16, 24, 0.88);
+            border: 1px solid #202938;
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.45),
+                inset 0 1px rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+        }
+
+        /* MODE BUTTONS */
+
+        .mode-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #293548;
+            background: #0b1018;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: 0.25s;
+        }
+
+        .mode-btn:hover {
+            border-color: #27b7ff;
+            color: white;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #0b79b5, #164e9b);
+            border-color: #36c5ff;
+            color: white;
+            box-shadow: 0 0 25px rgba(0, 180, 255, 0.15);
+        }
+
+        /* TRANSLATOR */
+
+        .translator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+ 
+        .box {
+            position: relative;
+        }
+
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .box-title {
+            font-weight: bold;
+            color: #e5e7eb;
+        }
+
+        .box-type {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            resize: vertical;
+            min-height: 220px;
+            border-radius: 15px;
+            border: 1px solid #293548;
+            background: #070b11;
+            color: #ffffff;
+            padding: 18px;
+            outline: none;
+            font-size: 17px;
+            line-height: 1.7;
+            transition: 0.25s;
+        }
+
+        textarea:focus {
+            border-color: #21b7ff;
+            box-shadow: 0 0 25px rgba(0, 183, 255, 0.08);
+        }
+
+        #output {
+            font-family: "Courier New", monospace;
+            color: #7dd3fc;
+        }
+
+        .counter {
+            margin-top: 8px;
+            color: #667085;
+            font-size: 12px;
+        }
+
+        /* ACTIONS */
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            border: none;
+            border-radius: 11px;
+            padding: 13px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .convert {
+            flex: 1;
+            min-width: 150px;
+            color: white;
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+        }
+
+        .convert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.25);
+        }
+
+        .secondary {
+            background: #111827;
+            border: 1px solid #293548;
+            color: #d1d5db;
+        }
+
+        .secondary:hover {
+            border-color: #36c5ff;
+            color: white;
+        }
+
+        /* MESSAGE */
+
+        .message {
+            min-height: 25px;
+            margin-top: 15px;
+            padding: 0 3px;
+            font-size: 13px;
+            color: #6ee7b7;
+        }
+
+        .message.error {
+            color: #fb7185;
+        }
+
+        /* REFERENCE */
+
+        .reference {
+            margin-top: 30px;
+            border-top: 1px solid #202938;
+            padding-top: 25px;
+        }
+
+        .reference h2 {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .reference-description {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .mapping-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+        }
+
+        .mapping {
+            background: #080d14;
+            border: 1px solid #1f2a3a;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .mapping:hover {
+            border-color: #2dbfff;
+            transform: translateY(-2px);
+        }
+
+        .letter {
+            display: block;
+            font-weight: bold;
+            font-size: 17px;
+            margin-bottom: 4px;
+        }
+
+        .code {
+            color: #67e8f9;
+            font-family: "Courier New", monospace;
+            font-size: 13px;
+        }
+
+        /* INFO */
+
+        .info {
+            margin-top: 25px;
+            padding: 18px;
+            background: rgba(14, 20, 31, 0.8);
+            border: 1px solid #202938;
+            border-radius: 14px;
+            color: #9ca3af;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .info strong {
+            color: #e5e7eb;
+        }
+
+        /* FOOTER */
+
+        footer {
+            text-align: center;
+            color: #4b5563;
+            font-size: 12px;
+            margin-top: 25px;
+            padding-bottom: 10px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 750px) {
+            body {
+                padding: 15px 10px;
+            }
+
+            .main-card {
+                padding: 17px;
+                border-radius: 18px;
+            }
+
+            .translator {
+                grid-template-columns: 1fr;
+            }
+
+            textarea {
+                height: 220px;
+            }
+
+            .mapping-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .mode-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .mapping-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <div class="logo">&lt;/&gt;</div>
+
+        <h1>Code Translator</h1>
+
+        <p class="subtitle">
+            Convert English ↔ Your Custom Code
+        </p>
+    </header>
+
+
+    <main class="main-card">
+
+        <!-- MODE -->
+
+        <div class="mode-buttons">
+
+            <button
+                id="englishMode"
+                class="mode-btn active"
+                onclick="setMode('english')">
+                English → Code
+            </button>
+
+            <button
+                id="codeMode"
+                class="mode-btn"
+                onclick="setMode('code')">
+                Code → English
+            </button>
+
+        </div>
+
+
+        <!-- TRANSLATOR -->
+
+        <div class="translator">
+
+            <!-- INPUT -->
+
+            <div class="box">
+
+                <div class="box-header">
+                    <span class="box-title" id="inputTitle">
+                        English Text
+                    </span>
+
+                    <span class="box-type" id="inputType">
+                        INPUT
+                    </span>
+                </div>
+
+                <textarea
+                    id="input"
+                    spellcheck="false"
+                    placeholder="Type your English text here..."></textarea>
+
+                <div class="counter" id="inputCounter">
+                    0 characters • 0 words
+                </div>
+
+            </div>
+
+
+            <!-- OUTPUT -->
+
+            <div class="box">
+
+                <div class="box-header">
+                    <span class="box-title" id="outputTitle">
+                        Custom Code
+                    </span>
+
+                    <span class="box-type">
+                        OUTPUT
+                    </span>
+                </div>
+
+                <textarea
+                    id="output"
+                    readonly
+                    spellcheck="false"
+                    placeholder="Your converted code will appear here..."></textarea>
+
+                <div class="counter" id="outputCounter">
+                    0 characters • 0 words
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- BUTTONS -->
+
+        <div class="actions">
+
+            <button
+                class="action-btn convert"
+                onclick="convertText()">
+                ⚡ Convert
+            </button>
+
+            <button
+                class="action-btn secondary"
+                onclick="copyResult()">
+                📋 Copy Result
+            </button>
+
+            <button
+                class="action-btn secondary"
+                onclick="swapMode()">
+                ⇄ Swap
+            </button>
+
+            <button
+                class="action-btn secondary"
+                onclick="clearAll()">
+                ✕ Clear
+            </button>
+
+        </div>
+
+
+        <div id="message" class="message"></div>
+
+
+        <!-- REFERENCE -->
+
+        <section class="reference">
+
+            <h2>Code Reference</h2>
+
+            <p class="reference-description">
+                Complete A–Z code mapping
+            </p>
+
+            <div
+                id="mappingGrid"
+                class="mapping-grid">
+            </div>
+
+        </section>
+
+
+        <!-- INFO -->
+
+        <div class="info">
+
+            <strong>How it works:</strong><br>
+
+            Each English letter has its own unique numerical code.
+            Spaces between words are represented by
+            <strong>/</strong>.
+
+            <br><br>
+
+            Example:<br>
+
+            <strong>HELLO WORLD</strong><br>
+
+            <span style="font-family: monospace; color:#67e8f9;">
+                .7 .4 .01 .01 .04 / .002 .04 .07 .01 .3
+            </span>
+
+        </div>
+
+    </main>
+
+
+    <footer>
+        Code Translator • No login required • Runs directly in your browser
+    </footer>
+
+</div>
+
+
+<script>
+
+    /*
+     * ==========================================
+     * CUSTOM CODE MAPPING
+     * ==========================================
+     */
+
+    const codeMap = {
+
+        A: ".0",
+        B: ".1",
+        C: ".2",
+        D: ".3",
+        E: ".4",
+        F: ".5",
+        G: ".6",
+        H: ".7",
+        I: ".8",
+        J: ".9",
+
+        K: ".00",
+        L: ".01",
+        M: ".02",
+        N: ".03",
+        O: ".04",
+        P: ".05",
+        Q: ".06",
+        R: ".07",
+        S: ".08",
+        T: ".09",
+
+        U: ".000",
+        V: ".001",
+        W: ".002",
+        X: ".003",
+        Y: ".004",
+        Z: ".005"
+    };
+
+
+    /*
+     * Create reverse mapping automatically.
+     *
+     * Example:
+     *
+     * .0   → A
+     * .004 → Y
+     * .005 → Z
+     */
+
+    const reverseMap = {};
+
+    for (const letter in codeMap) {
+        reverseMap[codeMap[letter]] = letter;
+    }
+
+
+    /*
+     * Current mode
+     */
+
+    let currentMode = "english";
+
+
+    /*
+     * DOM ELEMENTS
+     */
+
+    const input = document.getElementById("input");
+    const output = document.getElementById("output");
+
+    const inputTitle = document.getElementById("inputTitle");
+    const outputTitle = document.getElementById("outputTitle");
+
+    const inputCounter = document.getElementById("inputCounter");
+    const outputCounter = document.getElementById("outputCounter");
+
+    const message = document.getElementById("message");
+
+    const englishMode = document.getElementById("englishMode");
+    const codeMode = document.getElementById("codeMode");
+
+
+    /*
+     * ==========================================
+     * CREATE CODE REFERENCE
+     * ==========================================
+     */
+
+    function createReference() {
+
+        const grid = document.getElementById("mappingGrid");
+
+        grid.innerHTML = "";
+
+        for (const letter in codeMap) {
+
+            const item = document.createElement("div");
+
+            item.className = "mapping";
+
+            item.innerHTML = `
+                <span class="letter">${letter}</span>
+                <span class="code">${codeMap[letter]}</span>
+            `;
+
+            grid.appendChild(item);
+        }
+    }
+
+
+    /*
+     * ==========================================
+     * CHANGE MODE
+     * ==========================================
+     */
+
+    function setMode(mode) {
+
+        currentMode = mode;
+
+        message.textContent = "";
+        message.classList.remove("error");
+
+        englishMode.classList.remove("active");
+        codeMode.classList.remove("active");
+
+        if (mode === "english") {
+
+            englishMode.classList.add("active");
+
+            inputTitle.textContent = "English Text";
+            outputTitle.textContent = "Custom Code";
+
+            input.placeholder =
+                "Type your English text here...";
+
+            output.placeholder =
+                "Your converted code will appear here...";
+
+        } else {
+
+            codeMode.classList.add("active");
+
+            inputTitle.textContent = "Custom Code";
+            outputTitle.textContent = "English Text";
+
+            input.placeholder =
+                "Enter your code here...\nExample: .7 .4 .01 .01 .04 / .002 .04 .07 .01 .3";
+
+            output.placeholder =
+                "The English text will appear here...";
+        }
+
+        input.value = "";
+        output.value = "";
+
+        updateCounters();
+    }
+
+
+    /*
+     * ==========================================
+     * ENGLISH → CODE
+     * ==========================================
+     */
+
+    function englishToCode(text) {
+
+        let result = "";
+
+        for (let i = 0; i < text.length; i++) {
+
+            const character = text[i];
+
+            const upper = character.toUpperCase();
+
+            /*
+             * English alphabet
+             */
+
+            if (codeMap[upper]) {
+
+                result += codeMap[upper];
+
+            }
+
+            /*
+             * Space
+             */
+
+            else if (character === " ") {
+
+                /*
+                 * Avoid duplicate spaces around /
+                 */
+
+                result += " / ";
+
+            }
+
+            /*
+             * New line
+             */
+
+            else if (character === "\n") {
+
+                result += "\n";
+
+            }
+
+            /*
+             * Punctuation and numbers
+             *
+             * They remain unchanged.
+             */
+
+            else {
+
+                result += character;
+            }
+
+
+            /*
+             * Add a separator between
+             * consecutive codes.
+             */
+
+            if (
+                i < text.length - 1 &&
+                codeMap[upper] &&
+                codeMap[text[i + 1].toUpperCase()]
+            ) {
+
+                result += " ";
+            }
+
+        }
+
+        /*
+         * Clean excessive spaces around slash
+         */
+
+        result = result.replace(/\s*\/\s*/g, " / ");
+
+        /*
+         * Clean repeated spaces
+         */
+
+        result = result.replace(/[ ]{2,}/g, " ");
+
+        return result.trim();
+    }
+
+
+    /*
+     * ==========================================
+     * CODE → ENGLISH
+     * ==========================================
+     *
+     * Important:
+     *
+     * Codes have different lengths.
+     *
+     * .0
+     * .00
+     * .000
+     * .004
+     * .005
+     *
+     * Therefore we tokenize the code instead
+     * of reading individual characters.
+     */
+
+    function codeToEnglish(text) {
+
+        let result = "";
+        let invalidCodes = [];
+
+        /*
+         * Split by whitespace.
+         */
+
+        const tokens = text.trim().split(/\s+/);
+
+        for (let token of tokens) {
+
+            /*
+             * Slash = space
+             */
+
+            if (token === "/") {
+
+                result += " ";
+                continue;
+            }
+
+
+            /*
+             * Sometimes punctuation may be attached
+             * to a code, for example:
+             *
+             * .7!
+             *
+             * Separate punctuation from the code.
+             */
+
+            let match = token.match(/^(\.\d+)([^\d.]*)$/);
+
+            if (match) {
+
+                const code = match[1];
+                const punctuation = match[2];
+
+                if (reverseMap[code]) {
+
+                    result += reverseMap[code];
+
+                    result += punctuation;
+
+                } else {
+
+                    invalidCodes.push(code + punctuation);
+
+                    result += "�";
+                }
+
+            }
+
+            /*
+             * Handle punctuation by itself.
+             */
+
+            else if (/^[^\d.]+$/.test(token)) {
+
+                result += token;
+
+            }
+
+            /*
+             * Invalid code
+             */
+
+            else {
+
+                invalidCodes.push(token);
+
+                result += "�";
+            }
+        }
+
+        /*
+         * Remove accidental spaces before punctuation.
+         */
+
+        result = result.replace(/\s+([,.!?;:])/g, "$1");
+
+        return {
+            result: result.trim(),
+            invalidCodes: invalidCodes
+        };
+    }
+
+
+    /*
+     * ==========================================
+     * CONVERT
+     * ==========================================
+     */
+
+    function convertText() {
+
+        const text = input.value;
+
+        message.textContent = "";
+        message.classList.remove("error");
+
+        if (!text.trim()) {
+
+            output.value = "";
+
+            message.textContent =
+                "Please enter some text first.";
+
+            message.classList.add("error");
+
+            updateCounters();
+
+            return;
+        }
+
+
+        if (currentMode === "english") {
+
+            output.value = englishToCode(text);
+
+            message.textContent =
+                "✓ Converted successfully.";
+
+        } else {
+
+            const decoded = codeToEnglish(text);
+
+            output.value = decoded.result;
+
+            if (decoded.invalidCodes.length > 0) {
+
+                message.textContent =
+                    "Invalid code(s): " +
+                    decoded.invalidCodes.join(", ");
+
+                message.classList.add("error");
+
+            } else {
+
+                message.textContent =
+                    "✓ Converted successfully.";
+            }
+        }
+
+        updateCounters();
+    }
+
+
+    /*
+     * ==========================================
+     * COPY RESULT
+     * ==========================================
+     */
+
+    async function copyResult() {
+
+        if (!output.value) {
+
+            message.textContent =
+                "Nothing to copy.";
+
+            message.classList.add("error");
+
+            return;
+        }
+
+        try {
+
+            await navigator.clipboard.writeText(output.value);
+
+            message.classList.remove("error");
+
+            message.textContent =
+                "✓ Result copied to clipboard.";
+
+        } catch (error) {
+
+            /*
+             * Fallback for older browsers.
+             */
+
+            output.select();
+
+            document.execCommand("copy");
+
+            message.classList.remove("error");
+
+            message.textContent =
+                "✓ Result copied.";
+        }
+    }
+
+
+    /*
+     * ==========================================
+     * SWAP MODE
+     * ==========================================
+     */
+
+    function swapMode() {
+
+        const oldInput = input.value;
+        const oldOutput = output.value;
+
+        setMode(
+            currentMode === "english"
+                ? "code"
+                : "english"
+        );
+
+        input.value = oldOutput;
+        output.value = oldInput;
+
+        /*
+         * Automatically convert the current
+         * input in the new direction.
+         */
+
+        if (input.value.trim()) {
+            convertText();
+        }
+
+        updateCounters();
+    }
+
+
+    /*
+     * ==========================================
+     * CLEAR EVERYTHING
+     * ==========================================
+     */
+
+    function clearAll() {
+
+        input.value = "";
+        output.value = "";
+
+        message.textContent = "";
+        message.classList.remove("error");
+
+        updateCounters();
+
+        input.focus();
+    }
+
+
+    /*
+     * ==========================================
+     * COUNTERS
+     * ==========================================
+     */
+
+    function getCounterText(text) {
+
+        if (!text.trim()) {
+            return "0 characters • 0 words";
+        }
+
+        const characters = text.length;
+
+        const words = text
+            .trim()
+            .split(/\s+/)
+            .length;
+
+        return `${characters} characters • ${words} words`;
+    }
+
+
+    function updateCounters() {
+
+        inputCounter.textContent =
+            getCounterText(input.value);
+
+        outputCounter.textContent =
+            getCounterText(output.value);
+    }
+
+
+    /*
+     * ==========================================
+     * LIVE COUNTER
+     * ==========================================
+     */
+
+    input.addEventListener("input", function () {
+
+        updateCounters();
+
+        /*
+         * Optional live conversion.
+         *
+         * This makes the website feel instant.
+         */
+
+        if (input.value.trim()) {
+
+            if (currentMode === "english") {
+
+                output.value =
+                    englishToCode(input.value);
+
+            } else {
+
+                const decoded =
+                    codeToEnglish(input.value);
+
+                output.value =
+                    decoded.result;
+            }
+
+            updateCounters();
+
+        } else {
+
+            output.value = "";
+
+            message.textContent = "";
+            message.classList.remove("error");
+        }
+    });
+
+
+    /*
+     * ==========================================
+     * KEYBOARD SHORTCUT
+     * ==========================================
+     *
+     * Ctrl + Enter = Convert
+     */
+
+    input.addEventListener("keydown", function(event) {
+
+        if (event.ctrlKey && event.key === "Enter") {
+
+            convertText();
+        }
+    });
+
+
+    /*
+     * ==========================================
+     * START WEBSITE
+     * ==========================================
+     */
+
+    createReference();
+
+    updateCounters();
+
+</script>
+
+</body>
+</html>

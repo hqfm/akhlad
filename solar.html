@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Modified from gemini-code-1789320697410.html[cite: 2] -->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solar System Explorer Pro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:Arial,Helvetica,sans-serif;background:#030712;color:#fff;overflow-x:hidden}
+body:before,body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:-2}
+body:before{background-image:radial-gradient(2px 2px at 10% 20%,#fff,transparent),radial-gradient(1px 1px at 20% 80%,#fff,transparent),radial-gradient(2px 2px at 40% 30%,#fff,transparent),radial-gradient(1px 1px at 60% 70%,#fff,transparent),radial-gradient(2px 2px at 80% 20%,#fff,transparent),radial-gradient(1px 1px at 90% 80%,#fff,transparent);background-size:350px 350px;opacity:.65}
+body:after{background:radial-gradient(circle at 50% -10%,rgba(62,102,255,.2),transparent 40%),radial-gradient(circle at 90% 50%,rgba(132,40,255,.12),transparent 35%);z-index:-3}
+header{position:sticky;top:0;z-index:1000;backdrop-filter:blur(18px);background:rgba(3,7,18,.85);border-bottom:1px solid rgba(255,255,255,.1)}
+.navbar{max-width:1250px;margin:auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{font-size:23px;font-weight:900;white-space:nowrap}.logo span{color:#58a6ff}
+.search-area{position:relative;width:min(500px,60vw)}
+.search-area input{width:100%;padding:13px 45px 13px 18px;border-radius:30px;border:1px solid rgba(255,255,255,.15);outline:none;background:rgba(255,255,255,.08);color:white;font-size:15px}
+.search-area input::placeholder{color:#aeb7c7}.search-area input:focus{border-color:#58a6ff;box-shadow:0 0 20px rgba(88,166,255,.2)}
+.clear-search{position:absolute;right:14px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#aaa;font-size:20px;cursor:pointer}
+.hero{min-height:530px;max-width:1250px;margin:auto;padding:80px 25px 50px;display:flex;align-items:center;justify-content:space-between;gap:40px}
+.hero-text{flex:1}.tag{display:inline-block;padding:8px 15px;border-radius:30px;background:rgba(88,166,255,.12);border:1px solid rgba(88,166,255,.3);color:#7cbaff;margin-bottom:20px;font-size:13px}
+.hero h1{font-size:clamp(42px,7vw,76px);line-height:.98;margin-bottom:22px}.hero h1 span{background:linear-gradient(90deg,#62b0ff,#b477ff,#62b0ff);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200%}
+.hero p{max-width:650px;color:#aab4c7;font-size:18px;line-height:1.7}.hero-buttons{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap}
+.btn{border:0;cursor:pointer;padding:13px 21px;border-radius:30px;font-weight:bold;font-size:14px;transition:.25s}
+.btn-primary{background:#fff;color:#05070d}.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(255,255,255,.15)}
+.btn-secondary{color:white;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15)}.btn-secondary:hover{background:rgba(255,255,255,.13)}
+.solar-visual{width:400px;height:400px;position:relative;display:flex;align-items:center;justify-content:center}
+.sun-visual,.big-sun{border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff9a0,#ffd229 35%,#ff8a00 70%,#e44a00);box-shadow:0 0 30px #ffb000,0 0 80px rgba(255,150,0,.7),0 0 150px rgba(255,80,0,.35)}
+.sun-visual{width:120px;height:120px}.big-sun{width:230px;height:230px}
+.orbit{position:absolute;border:1px solid rgba(255,255,255,.13);border-radius:50%}.orbit.one{width:170px;height:170px}.orbit.two{width:250px;height:250px}.orbit.three{width:340px;height:340px}.orbit.four{width:390px;height:390px}
+.planet-dot{position:absolute;border-radius:50%}.dot1{width:9px;height:9px;background:#aaa;top:122px;left:126px}.dot2{width:13px;height:13px;background:#d5a15c;top:68px;right:102px}.dot3{width:15px;height:15px;background:#4f91e8;bottom:54px;left:91px}.dot4{width:12px;height:12px;background:#d65a42;right:15px;top:195px}
+.container{max-width:1250px;margin:auto;padding:20px}.section{margin:70px 0}.section-heading{margin-bottom:28px}.section-heading h2{font-size:34px;margin-bottom:8px}.section-heading p{color:#8f9aad}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.card{min-height:300px;border-radius:22px;padding:18px;cursor:pointer;position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.1);transition:.3s}
+.card:hover{transform:translateY(-7px);border-color:rgba(100,170,255,.5);box-shadow:0 20px 50px rgba(0,0,0,.35)}.card-image{height:175px;display:flex;align-items:center;justify-content:center;position:relative}
+.planet{width:115px;height:115px;border-radius:50%;position:relative;box-shadow:inset -25px -20px 35px rgba(0,0,0,.35),12px 12px 30px rgba(0,0,0,.4)}.planet::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(130deg,rgba(255,255,255,.4),transparent 35%)}
+.mercury{background:radial-gradient(circle at 35% 30%,#b9b1a5,#6d675f 65%,#383632)}.venus{background:repeating-linear-gradient(15deg,#e7bd77 0 9px,#b67c3b 10px 15px,#f0c886 16px 22px)}
+.earth{background:radial-gradient(circle at 65% 25%,#2b77d2 0 18%,transparent 19%),radial-gradient(circle at 30% 55%,#2e934e 0 18%,transparent 19%),radial-gradient(circle at 65% 70%,#47a45c 0 13%,transparent 14%),#2476d0}
+.mars{background:radial-gradient(circle at 30% 30%,#f19a65,transparent 15%),radial-gradient(circle at 65% 65%,#8f3928,transparent 20%),#bd5038}
+.jupiter{background:repeating-linear-gradient(0deg,#d7b18a 0 11px,#a86e4b 12px 19px,#e1c6a4 20px 29px,#9e6748 30px 36px)}
+.saturn{background:repeating-linear-gradient(0deg,#e3c48b 0 12px,#c49b62 13px 20px,#f0d49c 21px 29px)}.uranus{background:radial-gradient(circle at 35% 25%,#b8ffff,#66cbd4 70%,#3b8f9b)}.neptune{background:radial-gradient(circle at 30% 30%,#6597ff,transparent 20%),#2756c8}
+.ceres{width:85px;height:85px;background:#8d857d}.pluto{width:80px;height:80px;background:radial-gradient(circle at 65% 35%,#eee3cf 0 18%,transparent 19%),#a98d78}
+.haumea{width:100px;height:65px;border-radius:50%;transform:rotate(-12deg);background:#d4c2a8}.makemake{width:82px;height:82px;background:radial-gradient(circle at 30% 30%,#d88b61,#9b4931 70%)}.eris{width:82px;height:82px;background:#d4d0ca}
+.moon-vis{width:75px;height:75px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d9d9d9,#8c8c8c 65%,#404040);box-shadow:inset -15px -12px 20px rgba(0,0,0,.4)}
+.asteroid{width:88px;height:72px;border-radius:45% 55% 50% 45%;background:radial-gradient(circle at 30% 25%,#aaa 0 6%,transparent 7%),radial-gradient(circle at 65% 60%,#555 0 8%,transparent 9%),radial-gradient(circle at 35% 70%,#777 0 7%,transparent 8%),#777}
+.ring{position:absolute;width:170px;height:42px;border:9px solid rgba(221,196,145,.8);border-radius:50%;transform:rotate(-18deg)}
+.card h3{font-size:21px;margin-bottom:8px}.category{color:#8ebfff;font-size:12px;text-transform:uppercase;letter-spacing:1px}.card-description{color:#9ba7ba;font-size:13px;line-height:1.5;margin-top:9px}
+.sun-card{min-height:300px;border-radius:28px;padding:35px;background:radial-gradient(circle at 15% 50%,rgba(255,160,0,.2),transparent 30%),linear-gradient(120deg,rgba(255,255,255,.09),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:50px;cursor:pointer;transition:.3s}.sun-card:hover{transform:translateY(-5px)}
+.sun-card h2{font-size:42px;margin-bottom:15px}.sun-card p{color:#adb6c6;line-height:1.7;margin-bottom:15px}
+.search-results{display:none;margin-top:35px}.search-results.active{display:block}.result-title{margin-bottom:18px;color:#9fbfff}.result-list{display:grid;gap:12px}
+.result{padding:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;cursor:pointer;transition:.2s}.result:hover{background:rgba(255,255,255,.1)}
+.result strong{display:block;font-size:18px;margin-bottom:5px}.result span{color:#9da8ba;font-size:13px}.no-results{color:#8d99ad;padding:25px;text-align:center;border:1px dashed rgba(255,255,255,.12);border-radius:15px}
+
+/* ===== Real Surface / Globe Viewer ===== */
+.viewer-wrap{margin-top:25px;padding:22px;border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.09)}
+.viewer-title{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:15px}
+.viewer-title h3{font-size:22px}.viewer-title p{color:#8f9aad;font-size:13px;margin-top:5px}
+.viewer-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.viewer-tab{padding:9px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#dfe7f5;cursor:pointer}
+.viewer-tab.active{background:#fff;color:#05070d}
+.viewer-stage{min-height:360px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-radius:18px;background:radial-gradient(circle at center,rgba(50,90,160,.16),rgba(0,0,0,.3) 65%),#02050b}
+.globe{width:270px;height:270px;border-radius:50%;background-repeat:repeat;background-position:0 50%;background-size:auto 100%;box-shadow:inset -35px -25px 55px rgba(0,0,0,.48),inset 18px 10px 30px rgba(255,255,255,.10),0 0 45px rgba(100,160,255,.12);cursor:grab;position:relative;touch-action:none;transform:scale(1);transition:transform 0.1s ease-out}
+.globe:after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 32% 25%,rgba(255,255,255,.22),transparent 25%),radial-gradient(circle at 70% 75%,rgba(0,0,0,.22),transparent 48%);pointer-events:none}
+.globe.dragging{cursor:grabbing}
+.globe.sun-globe{box-shadow:inset -20px -15px 30px rgba(90,20,0,.25),0 0 55px rgba(255,150,0,.6)}
+.globe.saturn-globe{box-shadow:inset -35px -25px 55px rgba(0,0,0,.48),0 0 45px rgba(230,210,160,.15)}
+.globe.saturn-globe:before{content:"";position:absolute;left:50%;top:50%;width:360px;height:92px;transform:translate(-50%,-50%) rotate(-14deg);border:13px solid rgba(210,190,145,.48);border-radius:50%;z-index:-1}
+.map-stage{width:min(920px,95%);padding:15px}
+.surface-map{width:100%;max-height:340px;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,.12);display:block;background:#101826}.map-notice{padding:35px;text-align:center;color:#9da8ba;line-height:1.6;border:1px dashed rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.025);margin:10px}
+.viewer-note{font-size:12px;color:#7f8da3;text-align:center;margin-top:12px;line-height:1.5}
+.size-panel{display:none;grid-template-columns:1fr;gap:12px;width:min(850px,94%);padding:20px}
+.size-panel.show{display:grid}
+.size-row{display:grid;grid-template-columns:105px 1fr 90px;align-items:center;gap:10px;font-size:12px}
+.size-bar{height:12px;border-radius:10px;background:rgba(255,255,255,.08);overflow:hidden}
+.size-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#5da8ff,#b77aff)}
+.size-label{color:#aab5c7;text-align:right}
+.viewer-controls{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.viewer-control{padding:8px 12px;border-radius:18px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:#dce5f2;cursor:pointer;font-size:12px}
+.modal{display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);padding:20px;align-items:center;justify-content:center}.modal.show{display:flex}
+.modal-box{width:min(900px,100%);max-height:90vh;overflow-y:auto;border-radius:28px;background:#09101f;border:1px solid rgba(255,255,255,.13);padding:30px;position:relative;box-shadow:0 30px 100px rgba(0,0,0,.7)}
+.close-modal{position:absolute;right:20px;top:18px;border:0;background:rgba(255,255,255,.08);color:white;width:40px;height:40px;border-radius:50%;font-size:22px;cursor:pointer}
+.modal-header{display:flex;align-items:center;gap:25px;margin-bottom:28px}.modal-planet{width:125px;height:125px;flex-shrink:0;display:flex;align-items:center;justify-content:center}.modal-planet img{width:125px;height:125px;object-fit:cover;border-radius:50%;box-shadow:inset -25px -20px 35px rgba(0,0,0,.35),0 0 22px rgba(80,150,255,.18)}.modal-planet img{width:125px;height:125px;object-fit:contain;border-radius:50%;display:block;box-shadow:inset -20px -18px 30px rgba(0,0,0,.35),0 6px 24px rgba(0,0,0,.35)}.modal-header h2{font-size:42px}.modal-header p{color:#8ea1bd;margin-top:6px}
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:25px}.info-box{padding:17px;border-radius:15px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.07)}
+.info-box label{display:block;color:#7f8da5;font-size:12px;text-transform:uppercase;margin-bottom:6px}.info-box span{color:white;line-height:1.5}
+.extra-info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:-8px 0 25px}
+.extra-info-grid .info-box{background:rgba(255,255,255,.035)}
+.extra-info-grid .info-box span{font-size:13px}
+.science-source-note{color:#7f8da3;font-size:12px;line-height:1.5;margin-top:8px}
+.image-unavailable{min-height:170px;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;color:#9da8ba;background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,255,255,.01))}
+.image-unavailable strong{display:block;color:#dfe7f5;font-size:17px;margin-bottom:8px}
+@media(max-width:720px){.extra-info-grid{grid-template-columns:1fr}}
+
+.characteristics{padding:20px;border-radius:18px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.12);margin-bottom:20px}.characteristics h3{margin-bottom:10px}.characteristics p{color:#b2bdcd;line-height:1.7}
+.image-gallery{display:none;grid-template-columns:1fr;gap:20px;padding:10px}
+.gallery-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden; display:flex; flex-direction:column}
+.gallery-img{width:100%;height:300px;object-fit:cover;background:#05070d}
+.gallery-info{padding:15px}.gallery-info strong{color:#dfe7f5}
+.gallery-info h4{font-size:18px;margin-bottom:8px;color:#58a6ff}
+.gallery-info p{font-size:13px;color:#aab5c7;margin-bottom:5px;line-height:1.4}
+.moon-buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.moon-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:.2s}
+.moon-btn:hover{background:rgba(88,166,255,.2);border-color:#58a6ff}
+footer{border-top:1px solid rgba(255,255,255,.08);margin-top:100px;padding:35px 20px;text-align:center;color:#788499;font-size:13px}
+@media(max-width:1000px){.cards{grid-template-columns:repeat(3,1fr)}.hero{flex-direction:column;text-align:center}.hero p{margin:auto}.hero-buttons{justify-content:center}.solar-visual{transform:scale(.8)}}
+@media(max-width:720px){.navbar{flex-direction:column}.search-area{width:100%}.hero{padding-top:45px}.cards{grid-template-columns:repeat(2,1fr)}.sun-card{flex-direction:column;text-align:center;padding:25px}.big-sun{width:170px;height:170px}.modal-header{flex-direction:column;text-align:center}.info-grid{grid-template-columns:1fr}}
+@media(max-width:480px){.cards{grid-template-columns:1fr}.hero h1{font-size:45px}.solar-visual{transform:scale(.65);margin:-40px}.modal-box{padding:20px}.modal-header h2{font-size:32px}}
+</style>
+</head>
+<body>
+<header>
+<div class="navbar">
+<div class="logo">🌌 Solar<span>System</span></div>
+<div class="search-area">
+<input type="text" id="searchInput" placeholder="Search planet, dwarf planet, moon, asteroid..." autocomplete="off">
+<button class="clear-search" id="clearSearch">×</button>
+</div>
+</div>
+</header>
+
+<main>
+<section class="hero">
+<div class="hero-text">
+<div class="tag">🚀 EXPLORE OUR COSMIC NEIGHBORHOOD</div>
+<h1>Discover the<br><span>Solar System</span></h1>
+<p>Explore the Sun, planets, moons, dwarf planets, and notable asteroids. Discover wonders, view real surface maps, famous captures, and precise orbital rotations.</p>
+<div class="hero-buttons">
+<button class="btn btn-primary" onclick="document.getElementById('wonders').scrollIntoView()">Explore Wonders →</button>
+<button class="btn btn-secondary" onclick="openBody('Sun')">☀ Explore the Sun</button>
+</div>
+</div>
+<div class="solar-visual">
+<div class="orbit one"></div><div class="orbit two"></div><div class="orbit three"></div><div class="orbit four"></div>
+<div class="sun-visual"></div><div class="planet-dot dot1"></div><div class="planet-dot dot2"></div><div class="planet-dot dot3"></div><div class="planet-dot dot4"></div>
+</div>
+</section>
+
+<div class="container">
+<section class="search-results" id="searchResults">
+<div class="section-heading"><h2>Search Results</h2><p id="resultCount"></p></div>
+<div class="result-list" id="resultList"></div>
+</section>
+
+<section class="section" id="wonders">
+<div class="section-heading"><h2>✨ Wonders of our Solar System</h2><p>The most extreme and fascinating locations in our neighborhood.</p></div>
+<div class="cards">
+<div class="card" onclick="openWonder('Olympus Mons')"><div class="card-image"><div class="planet mars"></div></div><div class="category">Highest Mountain</div><h3>Olympus Mons</h3><div class="card-description">Located on Mars. It is the tallest volcano in the solar system, standing about 2.5 times the height of Mount Everest. Its uniqueness lies in its massive width and lack of tectonic plate movement on Mars, allowing it to grow uninterrupted.</div></div>
+<div class="card" onclick="openWonder('South Pole-Aitken Basin')"><div class="card-image"><div class="moon-vis"></div></div><div class="category">Deepest/Largest Crater</div><h3>South Pole-Aitken Basin</h3><div class="card-description">Located on Earth's Moon. It is one of the largest and oldest impact craters in the solar system, spanning about 2,500 km wide and 6 to 8 km deep.</div></div>
+<div class="card" onclick="openWonder('Mercury Surface')"><div class="card-image"><div class="planet mercury"></div></div><div class="category">Most Asteroid Impacts</div><h3>Mercury's Surface</h3><div class="card-description">Because Mercury lacks a substantial atmosphere to burn up incoming debris, it is the most heavily cratered planet, preserving the violent history of the Late Heavy Bombardment.</div></div>
+<div class="card" onclick="openWonder('Great Red Spot')"><div class="card-image"><div class="planet jupiter"></div></div><div class="category">Largest Storm</div><h3>Great Red Spot</h3><div class="card-description">A massive anticyclonic storm on Jupiter that has been raging for at least 400 years, large enough to swallow the Earth entirely.</div></div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-heading"><h2>☀ The Sun</h2><p>The central star of our solar system.</p></div>
+<div class="sun-card" onclick="openBody('Sun')">
+<div class="big-sun"></div>
+<div><h2>The Sun</h2><p>The Sun contains 99.8% of the mass in the entire solar system. Its gravity holds our solar system together.</p><button class="btn btn-primary">View Full Details →</button></div>
+</div>
+</section>
+
+<section class="section" id="planets">
+<div class="section-heading"><h2>🪐 The Eight Planets</h2><p>Select a planet to explore its information, rotation, and famous moons.</p></div>
+<div class="cards">
+<div class="card" onclick="openBody('Mercury')"><div class="card-image"><div class="planet mercury"></div></div><div class="category">Terrestrial Planet</div><h3>Mercury</h3><div class="card-description">The smallest and fastest planet in the solar system.</div></div>
+<div class="card" onclick="openBody('Venus')"><div class="card-image"><div class="planet venus"></div></div><div class="category">Terrestrial Planet</div><h3>Venus</h3><div class="card-description">The hottest planet, known for its runaway greenhouse effect.</div></div>
+<div class="card" onclick="openBody('Earth')"><div class="card-image"><div class="planet earth"></div></div><div class="category">Terrestrial Planet</div><h3>Earth</h3><div class="card-description">The only known planet to harbor abundant life.</div></div>
+<div class="card" onclick="openBody('Mars')"><div class="card-image"><div class="planet mars"></div></div><div class="category">Terrestrial Planet</div><h3>Mars</h3><div class="card-description">The Red Planet, home to Olympus Mons and Valles Marineris.</div></div>
+<div class="card" onclick="openBody('Jupiter')"><div class="card-image"><div class="planet jupiter"></div></div><div class="category">Gas Giant</div><h3>Jupiter</h3><div class="card-description">The largest planet, famous for its Great Red Spot.</div></div>
+<div class="card" onclick="openBody('Saturn')"><div class="card-image"><div class="planet saturn"></div><div class="ring"></div></div><div class="category">Gas Giant</div><h3>Saturn</h3><div class="card-description">The spectacular ringed planet with more than 140 known moons.</div></div>
+<div class="card" onclick="openBody('Uranus')"><div class="card-image"><div class="planet uranus"></div></div><div class="category">Ice Giant</div><h3>Uranus</h3><div class="card-description">An ice giant that essentially rolls on its side.</div></div>
+<div class="card" onclick="openBody('Neptune')"><div class="card-image"><div class="planet neptune"></div></div><div class="category">Ice Giant</div><h3>Neptune</h3><div class="card-description">The distant ice giant with the fastest solar-system winds.</div></div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-heading"><h2>🌕 Earth System</h2><p>The companion to our home planet.</p></div>
+<div class="cards">
+<div class="card" onclick="openBody('Moon')"><div class="card-image"><div class="moon-vis"></div></div><div class="category">Earth's Moon</div><h3>The Moon</h3><div class="card-description">Earth's only natural satellite and the first celestial body visited by humans.</div></div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-heading"><h2>🌑 Dwarf Planets</h2><p>The five officially recognized dwarf planets.</p></div>
+<div class="cards">
+<div class="card" onclick="openBody('Ceres')"><div class="card-image"><div class="planet ceres"></div></div><div class="category">Dwarf Planet</div><h3>Ceres</h3><div class="card-description">The only dwarf planet located in the inner solar system.</div></div>
+<div class="card" onclick="openBody('Pluto')"><div class="card-image"><div class="planet pluto"></div></div><div class="category">Dwarf Planet</div><h3>Pluto</h3><div class="card-description">Famous for its heart-shaped nitrogen-ice glacier.</div></div>
+<div class="card" onclick="openBody('Haumea')"><div class="card-image"><div class="planet haumea"></div></div><div class="category">Dwarf Planet</div><h3>Haumea</h3><div class="card-description">A rapidly rotating dwarf planet with a ring.</div></div>
+<div class="card" onclick="openBody('Makemake')"><div class="card-image"><div class="planet makemake"></div></div><div class="category">Dwarf Planet</div><h3>Makemake</h3><div class="card-description">A distant icy world with a reddish appearance.</div></div>
+<div class="card" onclick="openBody('Eris')"><div class="card-image"><div class="planet eris"></div></div><div class="category">Dwarf Planet</div><h3>Eris</h3><div class="card-description">The most massive known dwarf planet.</div></div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-heading"><h2>☄ Notable Asteroids</h2><p>Explore some important asteroids.</p></div>
+<div class="cards">
+<div class="card" onclick="openBody('Vesta')"><div class="card-image"><div class="asteroid"></div></div><div class="category">Asteroid</div><h3>Vesta</h3><div class="card-description">The second-most massive body in the asteroid belt.</div></div>
+<div class="card" onclick="openBody('Pallas')"><div class="card-image"><div class="asteroid"></div></div><div class="category">Asteroid</div><h3>Pallas</h3><div class="card-description">A major asteroid with a highly inclined orbit.</div></div>
+<div class="card" onclick="openBody('Bennu')"><div class="card-image"><div class="asteroid"></div></div><div class="category">Near-Earth Asteroid</div><h3>Bennu</h3><div class="card-description">A carbon-rich rubble-pile asteroid visited by OSIRIS-REx.</div></div>
+<div class="card" onclick="openBody('Ryugu')"><div class="card-image"><div class="asteroid"></div></div><div class="category">Near-Earth Asteroid</div><h3>Ryugu</h3><div class="card-description">A carbon-rich asteroid visited by Hayabusa2.</div></div>
+</div>
+</section>
+</div>
+</main>
+
+<footer>🌌 Solar System Explorer Pro<br><span style="display:block;margin-top:8px">Built utilizing enhanced planetary maps, historical image archives, and astronomical data.</span></footer>
+
+<div class="modal" id="modal">
+<div class="modal-box">
+<button class="close-modal" onclick="closeModal()">×</button>
+<div class="modal-header"><div class="modal-planet" id="modalPlanet"></div><div><h2 id="modalTitle"></h2><p id="modalCategory"></p></div></div>
+<div class="info-grid">
+<div class="info-box"><label>Discovered By</label><span id="modalDiscoverer"></span></div>
+<div class="info-box"><label>Discovery Date</label><span id="modalDate"></span></div>
+<div class="info-box"><label>Size / Radius</label><span id="modalSize"></span></div>
+<div class="info-box"><label>Possibility of Life</label><span id="modalLife"></span></div>
+<div class="info-box"><label>Rotation Period (Day)</label><span id="modalRot"></span></div>
+<div class="info-box"><label>Revolution Period (Year)</label><span id="modalRev"></span></div>
+<div class="info-box" style="grid-column:1/-1" id="moonsBox"><label>Moons</label><div class="moon-buttons" id="modalMoons"></div></div>
+</div>
+<div class="extra-info-grid" id="extraScienceGrid">
+<div class="info-box"><label>Object / Asteroid Number</label><span id="modalNumber"></span></div>
+<div class="info-box"><label>Discovery Telescope / Instrument</label><span id="modalDiscoveryTelescope"></span></div>
+<div class="info-box"><label>Surface Gravity</label><span id="modalGravity"></span></div>
+<div class="info-box"><label>Atmosphere vs Earth</label><span id="modalAtmosphere"></span></div>
+<div class="info-box"><label>Atmospheric Gases</label><span id="modalGases"></span></div>
+<div class="info-box"><label>Current Age</label><span id="modalAge"></span></div>
+<div class="info-box"><label>Born / Formed</label><span id="modalBorn"></span></div>
+<div class="info-box"><label>Future / “Death”</label><span id="modalDeath"></span></div>
+<div class="info-box"><label>Physical Rotation Direction</label><span id="modalSpinDirection"></span></div>
+<div class="info-box" style="grid-column:1/-1"><label>Formation & Scientific Contribution</label><span id="modalFormationContribution"></span></div>
+</div>
+<div class="characteristics"><h3>⭐ Unique Characteristics & Story</h3><p id="modalCharacteristics"></p></div>
+<div class="viewer-wrap">
+  <div class="viewer-title">
+    <div>
+      <h3>🌍 Real Surface, Globe & Media</h3>
+      <p id="viewerSubtitle">Explore the mapped surface and famous captures.</p>
+    </div>
+  </div>
+  <div class="viewer-tabs">
+    <button class="viewer-tab active" id="globeTab" onclick="showViewer('globe')">🌐 3D Globe Viewer</button>
+    <button class="viewer-tab" id="mapTab" onclick="showViewer('map')">🗺 Surface Map</button>
+    <button class="viewer-tab" id="sizeTab" onclick="showViewer('size')">📏 Relative Size</button>
+    <button class="viewer-tab" id="imageTab" onclick="showViewer('image')">📸 Famous Captures</button>
+  </div>
+  <div class="viewer-stage" id="globeStage">
+    <div class="globe" id="realGlobe"></div>
+  </div>
+  <div class="viewer-stage" id="mapStage" style="display:none">
+    <div class="map-stage">
+      <img class="surface-map" id="surfaceMap" alt="Planetary surface map"><div class="map-notice" id="mapNotice" style="display:none"></div>
+    </div>
+  </div>
+  <div class="viewer-stage" id="sizeStage" style="display:none">
+    <div class="size-panel" id="sizePanel"></div>
+  </div>
+  <div class="image-gallery" id="imageStage">
+  </div>
+  <div class="viewer-controls" id="globeControls">
+    <button class="viewer-control" onclick="toggleSpin()">⏯ Auto Rotate</button>
+    <button class="viewer-control" onclick="zoomGlobe(0.1)">➕ Zoom In</button>
+    <button class="viewer-control" onclick="zoomGlobe(-0.1)">➖ Zoom Out</button>
+    <button class="viewer-control" onclick="resetGlobe()">↺ Reset View (Center Poles)</button>
+  </div>
+  <div class="viewer-note" id="viewerNote">
+    Drag left/right to rotate. Auto-rotation follows the object’s physical spin direction: prograde = west-to-east, retrograde = east-to-west. Drag up/down and use Zoom to view poles.
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+const bodies={
+Sun:{category:"Central Star",discoverer:"Known since antiquity",date:"N/A",size:"696,340 km radius",life:"None",rot:"27 Earth days",rev:"230 million years (Galactic orbit)",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg",title:"AIA 304 Angstrom",agency:"NASA",telescope:"Solar Dynamics Observatory",date:"Aug 19, 2010",reason:"Captured to observe the solar atmosphere and massive solar flares in immense detail."}],characteristics:"The Sun contains 99.8% of the mass in the entire solar system. Its gravity holds the solar system together. It is a Yellow Dwarf (G-type main-sequence star) that is about 4.6 billion years old. Its surface temperature is about 5,500°C and its core temperature is about 15 million°C.",visual:"sun",dir:1},
+Mercury:{category:"Inner Planet • Terrestrial",discoverer:"Known since antiquity",date:"Antiquity",size:"2,439 km radius",life:"Extremely unlikely",rot:"59 Earth days",rev:"88 Earth days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/3/30/Mercury_in_color_-_Prockter07_centered.jpg",title:"Mercury in Color",agency:"NASA",telescope:"MESSENGER Spacecraft",date:"2008",reason:"To map the entirely of Mercury's heavily cratered surface and analyze its composition."}],characteristics:"Mercury is the smallest planet in the solar system. It is the fastest planet, traveling around the Sun at about 47 km/s. It has no moons and a heavily cratered surface. Mercury lacks an atmosphere, leaving it vulnerable to extreme asteroid impacts during its formation. Temperatures range from 430°C to -180°C.",visual:"mercury",dir:1},
+Venus:{category:"Inner Planet • Terrestrial",discoverer:"Known since antiquity",date:"Antiquity",size:"6,051 km radius",life:"None on the surface",rot:"243 Earth days (Retrograde - East to West)",rev:"225 Earth days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg",title:"Venus in Real Color",agency:"NASA",telescope:"Mariner 10",date:"1974",reason:"To capture the thick global cloud cover that causes Venus's runaway greenhouse effect."}],characteristics:"Venus is the hottest planet due to a runaway greenhouse effect. It spins retrograde (east to west) in the opposite direction to most planets. Its day lasts 243 Earth days, longer than its 225-day year. The thick atmosphere crushes the surface with 90 times Earth's pressure.",visual:"venus",dir:-1},
+Earth:{category:"Inner Planet • Terrestrial",discoverer:"Known since antiquity",date:"Antiquity",size:"6,371 km radius",life:"Yes — abundant life",rot:"23.9 Hours",rev:"365.25 Days",moons:["Moon"],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg",title:"The Blue Marble",agency:"NASA",telescope:"Apollo 17 Crew",date:"Dec 7, 1972",reason:"Captured to show Earth fully illuminated, becoming one of the most famous images in human history."}, {url:"https://upload.wikimedia.org/wikipedia/commons/d/d6/Earth_and_Moon_as_seen_from_Mars_Orbiter_Mission.png",title:"Earth and Moon",agency:"ISRO",telescope:"Mars Orbiter Mission (Mangalyaan)",date:"2014",reason:"Captured by ISRO's MOM spacecraft on its journey departing Earth for Mars."}],characteristics:"Earth is the only known planet to harbor life and the only one with liquid water on its surface. It has a protective nitrogen-oxygen atmosphere and a strong magnetic field that shields it from solar radiation. It formed roughly 4.5 billion years ago.",visual:"earth",dir:1},
+Moon:{category:"Natural Satellite",discoverer:"Known since antiquity",date:"Antiquity",size:"1,737 km radius",life:"None",rot:"27.3 Earth days (Tidally locked)",rev:"27.3 Earth days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/a/a4/Buzz_Aldrin_on_the_Moon%2C_Apollo_11.jpg",title:"Buzz Aldrin on the Moon",agency:"NASA",telescope:"Apollo 11 Crew",date:"Jul 20, 1969",reason:"Documentation of the first human landing on a celestial body."}, {url:"https://upload.wikimedia.org/wikipedia/commons/7/75/Chandrayaan-3_landing_site.jpg",title:"Vikram Lander Landing Site",agency:"ISRO",telescope:"Chandrayaan-3 / Pragyan Rover",date:"Aug 23, 2023",reason:"The successful landing near the lunar south pole, making India the first country to land in this region."}],characteristics:"Earth's only natural satellite. Its gravitational pull regulates Earth's tides and climate. It features the South Pole-Aitken basin, one of the largest craters in the solar system.",visual:"moon",dir:1},
+Mars:{category:"Inner Planet • Terrestrial",discoverer:"Known since antiquity",date:"Antiquity",size:"3,389 km radius",life:"Past/subsurface life possible",rot:"24.6 Hours",rev:"687 Earth days",moons:["Phobos","Deimos"],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg",title:"Mars True Color",agency:"ESA",telescope:"Rosetta",date:"Feb 24, 2007",reason:"To capture the iron-oxide rich surface that gives Mars its characteristic 'Red Planet' hue."}, {url:"https://upload.wikimedia.org/wikipedia/commons/0/0e/Mars_Orbiter_Mission_-_Mars_Full_Disk.jpg",title:"Mars Full Disk from MOM",agency:"ISRO",telescope:"Mars Orbiter Mission (Mangalyaan)",date:"Sep 28, 2014",reason:"Captured highly detailed global surface features upon successful Martian orbital insertion."}],characteristics:"The Red Planet. Home to Olympus Mons (the highest mountain) and Valles Marineris. Mars has two small moons. Evidence strongly suggests Mars had liquid water billions of years ago. It is heavily targeted for future human exploration.",visual:"mars",dir:1},
+Phobos:{category:"Martian Moon",discoverer:"Asaph Hall",date:"Aug 18, 1877",size:"11.2 km radius",life:"None",rot:"7 hours 39 minutes",rev:"7 hours 39 minutes",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/5/5c/Phobos_colour_2008.jpg",title:"Phobos High Resolution",agency:"NASA",telescope:"Mars Reconnaissance Orbiter (MRO)",date:"Mar 23, 2008",reason:"To study the giant Stickney crater and the moon's grooved terrain."}],characteristics:"The larger and closer of Mars' two moons. It orbits so close that it orbits Mars faster than Mars rotates. It is doomed to either crash into Mars or break into a ring in millions of years.",visual:"moon",dir:1},
+Deimos:{category:"Martian Moon",discoverer:"Asaph Hall",date:"Aug 12, 1877",size:"6.2 km radius",life:"None",rot:"30.3 Hours",rev:"30.3 Hours",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/8/8d/Deimos-MRO.jpg",title:"Deimos True Color",agency:"NASA",telescope:"Mars Reconnaissance Orbiter (MRO)",date:"Feb 21, 2009",reason:"Observation of the small, smooth Martian moon to understand its origin as a potential captured asteroid."}],characteristics:"The smaller and outermost of Mars' two moons. It is lumpy and heavily cratered, likely a captured asteroid.",visual:"moon",dir:1},
+Jupiter:{category:"Outer Planet • Gas Giant",discoverer:"Known since antiquity",date:"Antiquity",size:"69,911 km radius",life:"None on planet (possible on moons)",rot:"9.9 Hours",rev:"11.9 Earth years",moons:["Io","Europa","Ganymede","Callisto","Amalthea"],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg",title:"Jupiter High-Res",agency:"NASA",telescope:"Hubble",date:"2014",reason:"To monitor the changing atmospheric bands and the shrinking of the Great Red Spot."}, {url:"https://upload.wikimedia.org/wikipedia/commons/a/a2/Jupiter_by_Juno.jpg",title:"Jupiter's Swirling Clouds",agency:"NASA",telescope:"Juno Spacecraft",date:"2019",reason:"To study Jupiter's deep atmosphere and highly complex polar storms."}],characteristics:"Jupiter is the largest planet. Composed mostly of hydrogen and helium, it features the Great Red Spot, a storm larger than Earth. Jupiter has over 90 known moons, with its top five being intensely studied.",visual:"jupiter",dir:1},
+Io:{category:"Jovian Moon",discoverer:"Galileo Galilei",date:"Jan 8, 1610",size:"1,821 km radius",life:"Highly unlikely",rot:"1.77 Days",rev:"1.77 Days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/c/c5/Io_highest_resolution_true_color.jpg",title:"Io True Color",agency:"NASA",telescope:"Galileo Spacecraft",date:"1999",reason:"Observe active sulfur volcanoes and incredibly rapid surface changes."}],characteristics:"The most volcanically active body in the solar system, driven by immense tidal heating from Jupiter's gravity.",visual:"moon",dir:1},
+Europa:{category:"Jovian Moon",discoverer:"Galileo Galilei",date:"Jan 8, 1610",size:"1,560 km radius",life:"High possibility in ocean",rot:"3.55 Days",rev:"3.55 Days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/e/e4/Europa-moon-with-margins.jpg",title:"Europa Ice Crust",agency:"NASA",telescope:"Galileo Spacecraft",date:"1990s",reason:"Detailed mapping of the fractured water-ice crust covering a vast subsurface ocean."}],characteristics:"Possesses a smooth ice crust overlaying a massive subsurface ocean of liquid water, making it a prime target in the search for extraterrestrial life.",visual:"moon",dir:1},
+Ganymede:{category:"Jovian Moon",discoverer:"Galileo Galilei",date:"Jan 7, 1610",size:"2,634 km radius",life:"Possible in subsurface ocean",rot:"7.15 Days",rev:"7.15 Days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/f/f2/Ganymede_-_perijove_34_composite.png",title:"Ganymede by Juno",agency:"NASA",telescope:"Juno Spacecraft",date:"2021",reason:"High-resolution flyby to study the largest moon in the solar system and its magnetic field."}],characteristics:"The largest moon in the solar system (bigger than Mercury). It is the only moon known to have its own magnetic field.",visual:"moon",dir:1},
+Callisto:{category:"Jovian Moon",discoverer:"Galileo Galilei",date:"Jan 7, 1610",size:"2,410 km radius",life:"Unlikely",rot:"16.7 Days",rev:"16.7 Days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/e/e9/Callisto.jpg",title:"Callisto's Ancient Surface",agency:"NASA",telescope:"Galileo Spacecraft",date:"2001",reason:"To map the incredibly old, heavily cratered terrain of the Jovian moon."}],characteristics:"The most heavily cratered object in the solar system, essentially a dead, ancient world with possible subsurface water.",visual:"moon",dir:1},
+Amalthea:{category:"Jovian Moon",discoverer:"Edward Emerson Barnard",date:"Sep 9, 1892",size:"83 km radius",life:"None",rot:"11.9 Hours",rev:"11.9 Hours",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/a/aa/Amalthea_%28moon%29.jpg",title:"Amalthea Close-up",agency:"NASA",telescope:"Galileo Spacecraft",date:"1999",reason:"To observe the tiny, oddly shaped inner moon of Jupiter."}],characteristics:"A small, red, potato-shaped moon orbiting very close to Jupiter, residing entirely within Jupiter's radiation belts.",visual:"moon",dir:1},
+Saturn:{category:"Outer Planet • Gas Giant",discoverer:"Known since antiquity",date:"Antiquity",size:"58,232 km radius",life:"None on planet",rot:"10.7 Hours",rev:"29.5 Earth years",moons:["Titan","Enceladus","Mimas","Iapetus","Rhea"],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg",title:"Saturn Equinox",agency:"NASA",telescope:"Cassini Spacecraft",date:"2009",reason:"To observe the rings edge-on, revealing vertical structures and shadows not visible at other times."}],characteristics:"Famous for its spectacular complex ring system made of ice and rock. Saturn is the least dense planet (it could float in a giant bathtub). It has over 140 known moons.",visual:"saturn",dir:1},
+Titan:{category:"Saturnian Moon",discoverer:"Christiaan Huygens",date:"Mar 25, 1655",size:"2,574 km radius",life:"Possible (exotic)",rot:"15.9 Days",rev:"15.9 Days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/9/94/Huygens_surface_color_sr.jpg",title:"Titan Surface",agency:"ESA/NASA",telescope:"Huygens Probe",date:"Jan 14, 2005",reason:"First and only image captured from the surface of a moon in the outer solar system, revealing river channels."}],characteristics:"Saturn's largest moon. It is the only moon with a thick, planet-like atmosphere, and features stable lakes of liquid methane and ethane on its surface.",visual:"moon",dir:1},
+Enceladus:{category:"Saturnian Moon",discoverer:"William Herschel",date:"Aug 28, 1789",size:"252 km radius",life:"High possibility in ocean",rot:"1.37 Days",rev:"1.37 Days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/1/18/Enceladus_geysers.jpg",title:"Enceladus Geysers",agency:"NASA",telescope:"Cassini Spacecraft",date:"Nov 2005",reason:"Discovered active water-ice plumes erupting from the moon's south pole."}],characteristics:"An icy moon that sprays massive geysers of water vapor and organic material into space from its subsurface ocean. It creates Saturn's E ring.",visual:"moon",dir:1},
+Mimas:{category:"Saturnian Moon",discoverer:"William Herschel",date:"Sep 17, 1789",size:"198 km radius",life:"Unlikely",rot:"22.6 Hours",rev:"22.6 Hours",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/b/bc/Mimas_Cassini.jpg",title:"Mimas featuring Herschel Crater",agency:"NASA",telescope:"Cassini Spacecraft",date:"2010",reason:"Detailed view of the massive impact crater that makes Mimas look like the 'Death Star'."}],characteristics:"Known as the 'Death Star' moon due to the massive Herschel crater dominating its surface.",visual:"moon",dir:1},
+Iapetus:{category:"Saturnian Moon",discoverer:"G.D. Cassini",date:"Oct 25, 1671",size:"734 km radius",life:"Unlikely",rot:"79.3 Days",rev:"79.3 Days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/c/c9/Iapetus_as_seen_by_the_Cassini_probe_-_20071008.jpg",title:"Two-Toned Iapetus",agency:"NASA",telescope:"Cassini Spacecraft",date:"2007",reason:"To investigate the stark brightness contrast between its leading and trailing hemispheres."}],characteristics:"Features a stark 'two-toned' coloration (one side is highly reflective ice, the other dark as coal) and a massive equatorial ridge.",visual:"moon",dir:1},
+Rhea:{category:"Saturnian Moon",discoverer:"G.D. Cassini",date:"Dec 23, 1672",size:"763 km radius",life:"Unlikely",rot:"4.5 Days",rev:"4.5 Days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/1/13/Rhea_true_color.jpg",title:"Rhea True Color",agency:"NASA",telescope:"Cassini Spacecraft",date:"2006",reason:"To study the cratered, icy surface of Saturn's second-largest moon."}],characteristics:"Saturn's second largest moon, heavily cratered and consisting primarily of water ice. It may possess a tenuous exosphere of oxygen.",visual:"moon",dir:1},
+Uranus:{category:"Outer Planet • Ice Giant",discoverer:"William Herschel",date:"Mar 13, 1781",size:"25,362 km radius",life:"Extremely unlikely",rot:"17.2 Hours (Retrograde - East to West)",rev:"84 Earth years",moons:["Titania","Oberon","Umbriel","Ariel","Miranda"],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg",title:"Uranus True Color",agency:"NASA",telescope:"Voyager 2",date:"1986",reason:"The only spacecraft to ever visit Uranus, capturing its featureless pale-blue atmosphere."}],characteristics:"Uranus is an ice giant with a massive 97.77-degree axial tilt. It essentially rolls on its side as it orbits, producing extreme seasons. It rotates retrograde.",visual:"uranus",dir:-1},
+Titania:{category:"Uranian Moon",discoverer:"William Herschel",date:"Jan 11, 1787",size:"788 km radius",life:"Unlikely",rot:"8.7 Days",rev:"8.7 Days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/8/87/Titania.jpg",title:"Titania Voyager Flyby",agency:"NASA",telescope:"Voyager 2",date:"Jan 24, 1986",reason:"The only close approach mapping of the Uranian moons."}],characteristics:"The largest moon of Uranus, characterized by massive fault valleys and a mix of cratered and smooth terrain.",visual:"moon",dir:1},
+Oberon:{category:"Uranian Moon",discoverer:"William Herschel",date:"Jan 11, 1787",size:"761 km radius",life:"Unlikely",rot:"13.5 Days",rev:"13.5 Days",moons:[],images:[],characteristics:"The outermost major moon of Uranus, possessing a heavily cratered, ancient icy surface.",visual:"moon",dir:1},
+Umbriel:{category:"Uranian Moon",discoverer:"William Lassell",date:"Oct 24, 1851",size:"584 km radius",life:"Unlikely",rot:"4.1 Days",rev:"4.1 Days",moons:[],images:[],characteristics:"The darkest of Uranus' moons, dominated by a mysterious bright ring of material known as Wunda crater.",visual:"moon",dir:1},
+Ariel:{category:"Uranian Moon",discoverer:"William Lassell",date:"Oct 24, 1851",size:"578 km radius",life:"Unlikely",rot:"2.5 Days",rev:"2.5 Days",moons:[],images:[],characteristics:"Has the brightest and possibly youngest surface among Uranian moons, with extensive networks of deep canyons.",visual:"moon",dir:1},
+Miranda:{category:"Uranian Moon",discoverer:"Gerard Kuiper",date:"Feb 16, 1948",size:"235 km radius",life:"Unlikely",rot:"1.4 Days",rev:"1.4 Days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/3/30/Miranda.jpg",title:"Miranda's Shattered Surface",agency:"NASA",telescope:"Voyager 2",date:"Jan 24, 1986",reason:"To capture the bizarre, jumbled terrain and the enormous Verona Rupes cliff."}],characteristics:"Appears as if it was shattered and haphazardly reassembled, featuring some of the tallest cliffs in the solar system (Verona Rupes).",visual:"moon",dir:1},
+Neptune:{category:"Outer Planet • Ice Giant",discoverer:"Urbain Le Verrier and Johann Galle",date:"Sep 23, 1846",size:"24,622 km radius",life:"Extremely unlikely",rot:"16.1 Hours",rev:"165 Earth years",moons:["Triton","Proteus","Nereid","Larissa","Despina"],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/6/63/Neptune_-_Voyager_2_%2829347980845%29_flatten_crop.jpg",title:"Neptune and the Great Dark Spot",agency:"NASA",telescope:"Voyager 2",date:"1989",reason:"To document the farthest planet and observe its incredibly violent weather systems."}],characteristics:"Neptune is an ice giant found through mathematical prediction. It boasts the fastest winds in the solar system (over 2,000 km/h).",visual:"neptune",dir:1},
+Triton:{category:"Neptunian Moon",discoverer:"William Lassell",date:"Oct 10, 1846",size:"1,353 km radius",life:"Unlikely",rot:"5.8 Days (Retrograde Orbit)",rev:"5.8 Days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/a/a6/Triton_moon_mosaic_Voyager_2_%28large%29.jpg",title:"Triton Surface Mosaic",agency:"NASA",telescope:"Voyager 2",date:"Aug 25, 1989",reason:"Mapping the incredibly cold surface and discovering active nitrogen geysers."}],characteristics:"The largest moon of Neptune, notable for being the only large moon in the solar system with a retrograde orbit, suggesting it is a captured dwarf planet.",visual:"moon",dir:-1},
+Proteus:{category:"Neptunian Moon",discoverer:"Stephen Synnott (Voyager 2)",date:"1989",size:"210 km radius",life:"None",rot:"1.1 Days",rev:"1.1 Days",moons:[],images:[],characteristics:"One of the darkest objects in the solar system. It is heavily cratered and irregularly shaped.",visual:"moon",dir:1},
+Nereid:{category:"Neptunian Moon",discoverer:"Gerard Kuiper",date:"May 1, 1949",size:"170 km radius",life:"None",rot:"11.5 Hours",rev:"360.1 Days",moons:[],images:[],characteristics:"Known for having one of the most eccentric (highly elliptical) orbits of any moon in the solar system.",visual:"moon",dir:1},
+Larissa:{category:"Neptunian Moon",discoverer:"Harold Reitsema",date:"May 24, 1981",size:"97 km radius",life:"None",rot:"13.3 Hours",rev:"13.3 Hours",moons:[],images:[],characteristics:"An irregularly shaped, heavily cratered inner moon discovered by stellar occultation before Voyager 2 arrived.",visual:"moon",dir:1},
+Despina:{category:"Neptunian Moon",discoverer:"Stephen Synnott (Voyager 2)",date:"Jul 1989",size:"75 km radius",life:"None",rot:"8 Hours",rev:"8 Hours",moons:[],images:[],characteristics:"A tiny inner moon of Neptune that orbits within the planet's rings, helping to sculpt them.",visual:"moon",dir:1},
+Ceres:{category:"Dwarf Planet",discoverer:"Giuseppe Piazzi",date:"Jan 1, 1801",size:"476 km radius",life:"Unlikely",rot:"9 Hours",rev:"4.6 Earth years",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/7/76/Ceres_-_RC3_-_Haulani_Crater_%2822381131691%29_%28cropped%29.jpg",title:"Ceres Bright Spots",agency:"NASA",telescope:"Dawn Spacecraft",date:"2015",reason:"Mapped the entire surface of the dwarf planet, discovering the bright saline spots."}],characteristics:"The only dwarf planet in the inner solar system (Asteroid Belt). It constitutes about a third of the belt's mass and may have a subsurface ocean.",visual:"ceres",dir:1},
+Pluto:{category:"Dwarf Planet",discoverer:"Clyde Tombaugh",date:"Feb 18, 1930",size:"1,188 km radius",life:"Highly unlikely on surface",rot:"6.4 Days (Retrograde)",rev:"248 Earth years",moons:["Charon","Nix","Hydra","Kerberos","Styx"],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/e/ef/Pluto_in_True_Color_-_High-Res.jpg",title:"Pluto True Color",agency:"NASA",telescope:"New Horizons",date:"Jul 14, 2015",reason:"The first ever detailed image of Pluto's surface, revealing the heart-shaped Tombaugh Regio."}],characteristics:"Famous for its massive heart-shaped nitrogen glacier. Pluto forms a binary system with Charon.",visual:"pluto",dir:-1},
+Charon:{category:"Plutonian Moon",discoverer:"James Christy",date:"Jun 22, 1978",size:"606 km radius",life:"None",rot:"6.4 Days",rev:"6.4 Days",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/4/4e/Charon_in_True_Color_-_High-Res.jpg",title:"Charon True Color",agency:"NASA",telescope:"New Horizons",date:"Jul 14, 2015",reason:"Revealed a complex surface with deep canyons and a red polar cap."}],characteristics:"Pluto's largest moon. It is so massive relative to Pluto that they orbit a shared center of mass outside either body.",visual:"moon",dir:1},
+Nix:{category:"Plutonian Moon",discoverer:"Hubble Space Telescope",date:"May 15, 2005",size:"19 km radius",life:"None",rot:"Chaotic",rev:"24.8 Days",moons:[],images:[],characteristics:"An elongated moon that tumbles chaotically due to the shifting gravitational fields of Pluto and Charon.",visual:"moon",dir:1},
+Hydra:{category:"Plutonian Moon",discoverer:"Hubble Space Telescope",date:"May 15, 2005",size:"21 km radius",life:"None",rot:"Chaotic",rev:"38.2 Days",moons:[],images:[],characteristics:"The outermost known moon of Pluto, characterized by a highly reflective ice surface.",visual:"moon",dir:1},
+Kerberos:{category:"Plutonian Moon",discoverer:"Hubble Space Telescope",date:"Jun 28, 2011",size:"8 km radius",life:"None",rot:"Chaotic",rev:"32.1 Days",moons:[],images:[],characteristics:"A tiny, double-lobed moon orbiting between Nix and Hydra.",visual:"moon",dir:1},
+Styx:{category:"Plutonian Moon",discoverer:"Hubble Space Telescope",date:"Jun 26, 2012",size:"5 km radius",life:"None",rot:"Chaotic",rev:"20.1 Days",moons:[],images:[],characteristics:"The smallest known moon of Pluto, found while searching for potential hazards for the New Horizons probe.",visual:"moon",dir:1},
+Haumea:{category:"Dwarf Planet",discoverer:"Mike Brown / José Luis Ortiz",date:"2004",size:"~800 km radius",life:"None",rot:"3.9 Hours",rev:"284 Earth years",moons:["Hiʻiaka","Namaka"],images:[],characteristics:"Has an elongated, flattened shape caused by incredibly fast rotation. It is the only known dwarf planet to have a ring.",visual:"haumea",dir:1},
+"Hiʻiaka":{category:"Haumean Moon",discoverer:"Mike Brown",date:"2005",size:"~160 km radius",life:"None",rot:"Unknown",rev:"49 Days",moons:[],images:[],characteristics:"The larger, outer moon of Haumea, possessing a crystalline water ice surface.",visual:"moon",dir:1},
+Namaka:{category:"Haumean Moon",discoverer:"Mike Brown",date:"2005",size:"~85 km radius",life:"None",rot:"Unknown",rev:"18 Days",moons:[],images:[],characteristics:"The smaller, inner moon of Haumea.",visual:"moon",dir:1},
+Makemake:{category:"Dwarf Planet",discoverer:"Mike Brown, et al.",date:"Mar 31, 2005",size:"~715 km radius",life:"None",rot:"22.8 Hours",rev:"305 Earth years",moons:[],images:[],characteristics:"Covered in methane and ethane ices, it has a reddish hue. Its discovery led to Pluto's reclassification.",visual:"makemake",dir:1},
+Eris:{category:"Dwarf Planet",discoverer:"Mike Brown, et al.",date:"Jan 5, 2005",size:"1,163 km radius",life:"None",rot:"25.9 Hours",rev:"558 Earth years",moons:["Dysnomia"],images:[],characteristics:"The most massive known dwarf planet. It is 27% more massive than Pluto. Its discovery led directly to the 2006 redefinition of a planet.",visual:"eris",dir:1},
+Dysnomia:{category:"Eridian Moon",discoverer:"Mike Brown, et al.",date:"Sep 10, 2005",size:"~350 km radius",life:"None",rot:"Unknown",rev:"15.7 Days",moons:[],images:[],characteristics:"The only known moon of Eris, used to determine Eris' immense mass.",visual:"moon",dir:1},
+Vesta:{category:"Notable Asteroid",discoverer:"H.W.M. Olbers",date:"1807",size:"262 km radius",life:"None",rot:"5.3 Hours",rev:"3.6 Earth years",moons:[],images:[],characteristics:"The second-most massive body in the asteroid belt. It is differentiated with a crust, mantle, and core.",visual:"asteroid",dir:1},
+Pallas:{category:"Notable Asteroid",discoverer:"H.W.M. Olbers",date:"1802",size:"256 km radius",life:"None",rot:"7.8 Hours",rev:"4.6 Earth years",moons:[],images:[],characteristics:"The third-most massive asteroid with a highly inclined orbit.",visual:"asteroid",dir:1},
+Bennu:{category:"Near-Earth Asteroid",discoverer:"LINEAR project",date:"1999",size:"0.24 km radius",life:"None",rot:"4.3 Hours (Retrograde)",rev:"1.2 Earth years",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/0/05/Bennu_Asteroid_Mosaic_%2846153721385%29.jpg",title:"Asteroid Bennu Surface",agency:"NASA",telescope:"OSIRIS-REx",date:"2018",reason:"Mapped in extreme detail to select a sample return landing site."}],characteristics:"A carbon-rich rubble pile visited by OSIRIS-REx, which successfully returned pristine early solar system material to Earth.",visual:"asteroid",dir:-1},
+Ryugu:{category:"Near-Earth Asteroid",discoverer:"LINEAR project",date:"1999",size:"0.43 km radius",life:"None",rot:"7.6 Hours (Retrograde)",rev:"1.3 Earth years",moons:[],images:[{url:"https://upload.wikimedia.org/wikipedia/commons/e/ec/Ryugu_from_20km_distance.jpg",title:"Asteroid Ryugu",agency:"JAXA",telescope:"Hayabusa2",date:"2018",reason:"Visited to return primordial carbon-rich material to Earth."}],characteristics:"Visited by the Hayabusa2 mission, providing carbon-rich material samples back to Earth.",visual:"asteroid",dir:-1}
+
+};
+
+/*
+  SCIENCE PATCH
+  The original interface/data remain the base layer. No new catalog objects are added.
+  These fields only add/fix the requested scientific details.
+*/
+const sciencePatch={
+Sun:{
+  number:"Star — no asteroid/dwarf-planet number",
+  discoveryTelescope:"No discovery telescope — visible to the naked eye since antiquity",
+  gravity:"274 m/s² (~27.9 g)",
+  atmosphere:"Not comparable to Earth as a solid-surface atmosphere; the visible Sun is plasma",
+  gases:"~73% hydrogen, ~25% helium by mass; ~2% heavier elements",
+  age:"~4.6 billion years",
+  born:"Formed ~4.6 billion years ago from a collapsing molecular cloud; the center became hot enough for sustained nuclear fusion.",
+  death:"In ~5 billion years it is expected to leave the main sequence, expand into a red giant, shed its outer layers and end as a white dwarf.",
+  spinDirection:"Prograde overall (west-to-east at low latitudes; differential rotation)",
+  formation:"Born from the same collapsing solar nebula that produced the rest of the solar system.",
+  contribution:"Its gravity dominates the solar system; its energy drives planetary climates and chemistry and makes life on Earth possible."
+},
+Mercury:{
+  number:"Planet — no asteroid number",
+  discoveryTelescope:"No discovery telescope — naked-eye planet known since antiquity",
+  gravity:"3.70 m/s² (~0.38 g)",
+  atmosphere:"Exosphere; far less than Earth (effectively ~10⁻¹² Earth surface pressure)",
+  gases:"O, Na, H, He and K in an extremely thin exosphere",
+  age:"~4.5 billion years",
+  born:"Accreted from rocky material in the inner solar nebula ~4.5 billion years ago.",
+  death:"No separate near-term death event is known. In the Sun's red-giant phase, Mercury is expected to be destroyed or engulfed.",
+  spinDirection:"Prograde — west-to-east",
+  formation:"Built by accretion from metal-rich inner-solar-system material.",
+  contribution:"Preserves an ancient record of impact history and extreme solar-system conditions."
+},
+Venus:{
+  number:"Planet — no asteroid number",
+  discoveryTelescope:"No discovery telescope — naked-eye planet known since antiquity",
+  gravity:"8.87 m/s² (~0.90 g)",
+  atmosphere:"~92× Earth's surface pressure",
+  gases:"~96.5% CO₂, ~3.5% N₂; traces of SO₂ and other gases",
+  age:"~4.5 billion years",
+  born:"Accreted from rocky planetesimals in the early inner solar system.",
+  death:"Its long-term fate follows the Sun: the surface environment will be radically altered as the Sun brightens and later becomes a red giant.",
+  spinDirection:"Retrograde — east-to-west",
+  formation:"Formed in the hot inner solar nebula and later developed a runaway greenhouse climate.",
+  contribution:"A natural laboratory for planetary climate evolution and runaway greenhouse physics."
+},
+Earth:{
+  number:"Planet — no asteroid number",
+  discoveryTelescope:"No discovery telescope — known since antiquity",
+  gravity:"9.81 m/s² (1.00 g)",
+  atmosphere:"1.00× Earth — reference atmosphere",
+  gases:"~78.08% N₂, ~20.95% O₂, ~0.93% Ar, ~0.04% CO₂ + variable H₂O",
+  age:"~4.54 billion years",
+  born:"Accreted from dust and planetesimals in the young solar system; the Moon likely formed after a giant impact.",
+  death:"Habitability is expected to decline as the Sun brightens; the final planetary fate occurs during the Sun's red-giant evolution in roughly ~5 billion years.",
+  spinDirection:"Prograde — west-to-east",
+  formation:"Accreted in the inner solar system and developed a differentiated interior, oceans, atmosphere and active geology.",
+  contribution:"The only world currently known to host life and the only known source of confirmed biosphere-driven planetary change."
+},
+Moon:{
+  number:"Natural satellite — no asteroid number",
+  discoveryTelescope:"No discovery telescope — known since antiquity",
+  gravity:"1.62 m/s² (~0.165 g)",
+  atmosphere:"Extremely thin exosphere; vastly thinner than Earth",
+  gases:"Trace He, Ne, Ar plus Na, K and other exospheric species",
+  age:"~4.5 billion years",
+  born:"Most evidence supports formation after a giant impact between the early Earth and a Mars-sized body.",
+  death:"No known sudden death. It is slowly receding from Earth; its long-term environment will change as the Sun evolves.",
+  spinDirection:"Prograde — west-to-east; tidally locked to Earth",
+  formation:"Accreted largely from material ejected by the giant impact that formed the Earth-Moon system.",
+  contribution:"Stabilizes Earth's obliquity to some degree, drives tides, preserves impact history and records the early solar system."
+},
+Mars:{
+  number:"Planet — no asteroid number",
+  discoveryTelescope:"No discovery telescope — naked-eye planet known since antiquity",
+  gravity:"3.71 m/s² (~0.38 g)",
+  atmosphere:"~0.006× Earth's surface pressure",
+  gases:"~95.3% CO₂, ~2.7% N₂, ~1.6% Ar, variable H₂O",
+  age:"~4.5 billion years",
+  born:"Accreted from rocky material in the early inner solar system.",
+  death:"No separate near-term death event is known. Over geologic time Mars will continue cooling and losing atmosphere; the Sun's red-giant phase will eventually transform the planet.",
+  spinDirection:"Prograde — west-to-east",
+  formation:"Formed by accretion and differentiated into crust, mantle and core.",
+  contribution:"Preserves evidence of ancient water, climate change and potentially habitable environments beyond Earth."
+},
+Jupiter:{
+  number:"Planet — no asteroid number",
+  discoveryTelescope:"No discovery telescope — naked-eye planet known since antiquity",
+  gravity:"24.79 m/s² (~2.53 g at cloud tops/reference level)",
+  atmosphere:"No solid surface; very deep hydrogen-helium atmosphere, so an Earth-pressure ratio is not directly comparable",
+  gases:"~90% H₂ and ~10% He by volume, with trace methane, ammonia, water and other compounds",
+  age:"~4.6 billion years",
+  born:"Formed by accretion of a large core followed by rapid capture of hydrogen and helium from the solar nebula.",
+  death:"Expected to remain a gas giant until the Sun's red-giant evolution radically changes the solar system.",
+  spinDirection:"Prograde — west-to-east",
+  formation:"The largest planet formed early enough to dominate the growth and orbital evolution of the outer planets.",
+  contribution:"Its gravity strongly shapes asteroid/comet trajectories and the architecture of the outer solar system."
+},
+Saturn:{
+  number:"Planet — no asteroid number",
+  discoveryTelescope:"No discovery telescope — naked-eye planet known since antiquity",
+  gravity:"10.44 m/s² (~1.06 g at the equatorial reference level)",
+  atmosphere:"No solid surface; deep gas envelope, so a direct Earth-pressure comparison is not meaningful",
+  gases:"Mostly H₂ and He with traces of CH₄, NH₃ and other compounds",
+  age:"~4.6 billion years",
+  born:"Formed by accretion of a core followed by capture of nebular hydrogen and helium.",
+  death:"Its atmosphere will be transformed as the Sun becomes a red giant; the rings are also expected to evolve and disperse over time.",
+  spinDirection:"Prograde — west-to-east",
+  formation:"Assembled in the outer solar nebula and retained a massive gaseous envelope.",
+  contribution:"Its rings and moons form one of the solar system's richest natural laboratories for disk, tidal and planetary processes."
+},
+Uranus:{
+  number:"Planet — no asteroid number",
+  discoveryTelescope:"William Herschel's reflecting telescope, 1781",
+  gravity:"8.69 m/s² (~0.89 g)",
+  atmosphere:"Deep atmosphere; no solid surface, so Earth-pressure comparison is not directly equivalent",
+  gases:"~82.5% H₂, ~15.2% He, ~2.3% CH₄ by volume (approx.)",
+  age:"~4.6 billion years",
+  born:"Formed from icy/rocky planetesimals in the outer solar nebula, then captured a gaseous envelope.",
+  death:"Long-term fate follows the solar system's evolution as the Sun becomes a red giant.",
+  spinDirection:"Retrograde by standard convention — east-to-west; axial tilt ~98°",
+  formation:"Formed in the cold outer solar system and later experienced an event that left its extreme axial tilt.",
+  contribution:"Provides a key comparison point for ice-giant atmospheres, magnetospheres and extreme axial orientation."
+},
+Neptune:{
+  number:"Planet — no asteroid number",
+  discoveryTelescope:"Berlin Observatory refractor; observed by Johann Galle and Heinrich d'Arrest in 1846 after mathematical prediction",
+  gravity:"11.15 m/s² (~1.14 g)",
+  atmosphere:"Deep atmosphere; no solid surface, so direct Earth-pressure comparison is not meaningful",
+  gases:"Mostly H₂ and He with ~1–2% CH₄ by volume in the upper atmosphere",
+  age:"~4.6 billion years",
+  born:"Formed in the outer solar system from icy/rocky material and later accumulated a deep gaseous envelope.",
+  death:"Long-term fate follows the solar system's evolution as the Sun becomes a red giant.",
+  spinDirection:"Prograde — west-to-east",
+  formation:"Its present orbit and composition reflect the migration and gravitational rearrangement of the giant planets.",
+  contribution:"Helps scientists understand ice-giant weather, fast winds, planetary migration and the distant edge of the planetary system."
+},
+Ceres:{
+  number:"(1) Ceres",
+  discoveryTelescope:"Giuseppe Piazzi's observatory telescope at Palermo, 1801",
+  gravity:"~0.27 m/s² (~0.028 g)",
+  atmosphere:"No substantial atmosphere; transient vapor/exosphere, vastly thinner than Earth",
+  gases:"Water vapor and trace exospheric species detected/interpreted; no Earth-like atmosphere",
+  age:"~4.5 billion years",
+  born:"Accreted from rocky and icy material in the asteroid belt.",
+  death:"No known sudden death; impacts and thermal evolution will continue to modify it over immense timescales.",
+  spinDirection:"Prograde — west-to-east",
+  formation:"Ceres is a surviving embryo of the early solar system and the largest body in the asteroid belt.",
+  contribution:"Bridges the gap between asteroids and planets and preserves evidence of water-rich chemistry in the early solar system."
+},
+Pluto:{
+  number:"(134340) Pluto",
+  discoveryTelescope:"13-inch astrograph at Lowell Observatory, Clyde Tombaugh, 1930",
+  gravity:"~0.62 m/s² (~0.063 g)",
+  atmosphere:"Very thin and seasonal; far below Earth's surface pressure (can collapse/freeze onto the surface)",
+  gases:"Mainly N₂ with CH₄ and CO traces in the atmosphere",
+  age:"~4.5 billion years",
+  born:"Accreted from icy and rocky material in the Kuiper Belt region.",
+  death:"No near-term death event is known; its atmosphere can freeze and later re-form as Pluto moves around its long orbit.",
+  spinDirection:"Retrograde — east-to-west",
+  formation:"Formed in the Kuiper Belt from primordial icy material.",
+  contribution:"New Horizons transformed our understanding of Kuiper Belt worlds and helped reveal active geology on small icy bodies."
+},
+Haumea:{
+  number:"(136108) Haumea",
+  discoveryTelescope:"Discovery credit is disputed; observations include Sierra Nevada Observatory (2003) and later Caltech/Palomar work",
+  gravity:"~0.4–0.5 m/s² (estimate)",
+  atmosphere:"No confirmed substantial atmosphere; vastly thinner than Earth",
+  gases:"Surface volatiles dominated by water ice; no confirmed Earth-like atmosphere",
+  age:"~4.5 billion years",
+  born:"Formed in the Kuiper Belt; a major collision is a leading idea for its unusual spin and collisional family.",
+  death:"No known sudden death event; long-term evolution is dominated by impacts and solar-system dynamics.",
+  spinDirection:"Rapid prograde rotation — west-to-east; ~3.9–4.0 h day",
+  formation:"Likely shaped by an ancient large collision that helped create its elongated figure and satellite system.",
+  contribution:"Shows how collisions can reshape distant icy worlds and demonstrates that rings can exist around Kuiper Belt objects."
+},
+Makemake:{
+  number:"(136472) Makemake",
+  discoveryTelescope:"Palomar Observatory Samuel Oschin Telescope, 2005 discovery survey",
+  gravity:"~0.5 m/s² (estimate)",
+  atmosphere:"No stable Earth-like atmosphere known; may develop a very tenuous seasonal atmosphere",
+  gases:"Surface dominated by methane and ethane ices; atmosphere, when present, is very thin",
+  age:"~4.5 billion years",
+  born:"Accreted from icy Kuiper Belt material in the early solar system.",
+  death:"No known sudden death event; seasonal surface/atmospheric changes continue as it follows its long orbit.",
+  spinDirection:"Prograde — west-to-east",
+  formation:"A primordial Kuiper Belt world that preserved volatile ices far from the Sun.",
+  contribution:"Provides a natural laboratory for cold volatile ices and the diversity of dwarf planets."
+},
+Eris:{
+  number:"(136199) Eris",
+  discoveryTelescope:"Samuel Oschin Telescope at Palomar Observatory; discovery announced 2005",
+  gravity:"~0.82 m/s² (~0.084 g)",
+  atmosphere:"Extremely thin and can collapse/freeze onto the surface; vastly thinner than Earth",
+  gases:"Surface rich in nitrogen/methane/ethane ices; atmosphere is likely transient and extremely thin",
+  age:"~4.5 billion years",
+  born:"Formed in the distant outer solar system/Kuiper Belt population from icy-rocky material.",
+  death:"No known sudden death event; atmosphere may periodically collapse and reappear with seasonal changes.",
+  spinDirection:"Prograde — west-to-east",
+  formation:"A large scattered-disk/outer-solar-system world formed from primordial icy material.",
+  contribution:"Its discovery directly helped force the scientific clarification of the definition of a planet in 2006."
+},
+Vesta:{
+  number:"(4) Vesta",
+  discoveryTelescope:"Heinrich Olbers' telescope in Bremen, 1807",
+  gravity:"~0.25 m/s² (~0.026 g)",
+  atmosphere:"No substantial atmosphere",
+  gases:"No stable atmosphere; extremely tenuous exosphere only",
+  age:"~4.56 billion years",
+  born:"Accreted in the early asteroid belt and melted enough to differentiate into crust, mantle and core.",
+  death:"No sudden death expected; long-term collisions can fragment Vesta.",
+  spinDirection:"Prograde — west-to-east",
+  formation:"A differentiated asteroid that preserved a crust, mantle and core from early solar-system heating.",
+  contribution:"A window into rocky planet formation; NASA's Dawn mapped it in detail."
+},
+Pallas:{
+  number:"(2) Pallas",
+  discoveryTelescope:"Heinrich Olbers' telescope in Bremen, 1802",
+  gravity:"~0.21 m/s² (~0.021 g)",
+  atmosphere:"No substantial atmosphere",
+  gases:"No stable atmosphere; only an extremely tenuous exosphere",
+  age:"~4.5 billion years",
+  born:"Accreted from primordial rocky material in the asteroid belt.",
+  death:"No known sudden death; long-term collisions can break or reshape it.",
+  spinDirection:"Prograde — west-to-east",
+  formation:"A large early asteroid whose unusually inclined orbit records dynamical evolution in the asteroid belt.",
+  contribution:"Important for understanding the diversity and dynamical history of large asteroids."
+},
+Bennu:{
+  number:"(101955) Bennu",
+  discoveryTelescope:"LINEAR survey telescope system, 1999",
+  gravity:"~0.000006–0.00001 g (very weak surface gravity; varies by location)",
+  atmosphere:"None; vacuum-level environment",
+  gases:"No stable atmosphere",
+  age:"~4.5 billion years (its material is primitive)",
+  born:"A rubble-pile asteroid assembled from fragments of a larger parent body after an ancient collision.",
+  death:"May remain intact for very long periods, but its orbit can change through planetary encounters and sunlight-driven Yarkovsky forces; eventual disruption or impact is possible.",
+  spinDirection:"Retrograde — east-to-west",
+  formation:"A primitive carbon-rich near-Earth asteroid preserving early solar-system material.",
+  contribution:"OSIRIS-REx returned a sample that lets scientists study pristine material from the early solar system."
+},
+Ryugu:{
+  number:"(162173) Ryugu",
+  discoveryTelescope:"LINEAR survey, 1999",
+  gravity:"~0.000004–0.00001 g (very weak)",
+  atmosphere:"None; vacuum-level environment",
+  gases:"No stable atmosphere",
+  age:"~4.5 billion years (primitive material)",
+  born:"A rubble-pile near-Earth asteroid assembled from fragments of an older parent body.",
+  death:"May eventually fragment, collide, or be redirected by planetary encounters; no precise 'death date' is known.",
+  spinDirection:"Retrograde — east-to-west",
+  formation:"Primitive carbon-rich material remained comparatively unaltered since the early solar system.",
+  contribution:"Hayabusa2 returned samples that help test how water and organics were delivered and altered in the early solar system."
+}
+};
+
+const defaultMoonScience={
+  number:"Natural satellite — no asteroid number",
+  discoveryTelescope:"See object-specific discovery entry below",
+  gravity:"Low surface gravity",
+  atmosphere:"None or extremely tenuous exosphere in most cases; far thinner than Earth",
+  gases:"Mostly trace exospheric species; composition varies by moon",
+  age:"~4.5 billion years",
+  born:"Formed in the early solar system or acquired through giant impacts/capture; exact origin is object-specific.",
+  death:"No single universal death mechanism; future outcomes include continued cooling, impacts, orbital migration, disruption or collision depending on the moon.",
+  spinDirection:"Usually prograde rotation; some moons are tidally locked. See the rotation entry.",
+  formation:"A surviving natural satellite of a planet or dwarf planet.",
+  contribution:"Moon systems record planetary growth, tidal evolution, impacts, internal oceans/volcanism and dynamical history."
+};
+
+for(const [name, patchEntry] of Object.entries(sciencePatch)) {
+  if(bodies[name]) bodies[name] = {...bodies[name], ...patchEntry};
+}
+
+const objectSpecificScience={
+Phobos:{number:"Natural satellite — no asteroid number",discoveryTelescope:"U.S. Naval Observatory 26-inch refractor, 1877",gravity:"~0.006 m/s²",atmosphere:"None / trace exosphere",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Likely captured asteroid or impact-related origin; exact origin remains debated.",death:"Likely to spiral inward and either impact Mars or be disrupted into a ring on a tens-of-millions-of-years timescale.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Small irregular Martian moon with a very close orbit.",contribution:"A key test case for Martian moon origins and tidal evolution."},
+Deimos:{number:"Natural satellite — no asteroid number",discoveryTelescope:"U.S. Naval Observatory 26-inch refractor, 1877",gravity:"~0.003 m/s²",atmosphere:"None / trace exosphere",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Likely captured or impact-related; exact origin remains debated.",death:"Long-term orbital evolution is slow; disruption or escape/impact is possible over immense timescales.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Small outer Martian moon.",contribution:"Helps constrain the origin and dynamical evolution of the Martian satellite system."},
+Io:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Galileo's astronomical telescope, 1610",gravity:"1.80 m/s² (~0.18 g)",atmosphere:"Very thin SO₂-dominated atmosphere; far below Earth",gases:"Mainly SO₂ with traces of SO, NaCl and other volcanic species",age:"~4.5 billion years",born:"Formed in Jupiter's circumplanetary disk.",death:"Continued tidal heating and volcanism will reshape the surface for billions of years; no sudden death known.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Built from material orbiting the young Jupiter.",contribution:"The most volcanically active world known, showing how tidal forces can power planetary geology."},
+Europa:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Galileo's astronomical telescope, 1610",gravity:"1.31 m/s² (~0.13 g)",atmosphere:"Extremely thin O₂ atmosphere; far below Earth",gases:"O₂ plus trace H₂O and other sputtered species",age:"~4.5 billion years",born:"Formed in Jupiter's circumplanetary disk.",death:"Future surface changes depend on internal ocean and tidal heating; no known sudden death.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Ice-rock moon heated by tidal flexing, likely sustaining a subsurface ocean.",contribution:"One of the leading places to study habitable subsurface oceans beyond Earth."},
+Ganymede:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Galileo's astronomical telescope, 1610",gravity:"1.43 m/s² (~0.15 g)",atmosphere:"Extremely thin oxygen-bearing exosphere",gases:"O₂, O₃ and trace species",age:"~4.5 billion years",born:"Formed in Jupiter's circumplanetary disk.",death:"No sudden death known; long-term tidal and impact evolution will slowly alter the surface.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Large differentiated ice-rock moon with its own magnetic field.",contribution:"Largest moon in the solar system and the only moon known to generate its own intrinsic magnetic field."},
+Callisto:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Galileo's astronomical telescope, 1610",gravity:"1.24 m/s² (~0.13 g)",atmosphere:"Very thin CO₂-rich exosphere; far below Earth",gases:"CO₂ plus trace O₂ and other species",age:"~4.5 billion years",born:"Formed in Jupiter's circumplanetary disk.",death:"No known sudden death; ancient surface continues to accumulate impacts.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Ice-rock moon that preserves an ancient, heavily cratered surface.",contribution:"A benchmark for ancient impact history and the outer Jovian satellite environment."},
+Amalthea:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Lick Observatory 36-inch refractor, 1892",gravity:"~0.02 m/s²",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Formed from Jupiter's inner satellite system material.",death:"Can eventually fragment through impacts or be affected by tidal/ring evolution.",spinDirection:"Prograde — west-to-east; likely tidally locked",formation:"Small irregular inner Jovian moon.",contribution:"Helps shape and replenish material in Jupiter's faint inner dust/ring environment."},
+Titan:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Christiaan Huygens' refracting telescope, 1655",gravity:"1.35 m/s² (~0.14 g)",atmosphere:"~1.45× Earth's surface pressure",gases:"~95% N₂, ~5% CH₄ with traces of other organics",age:"~4.5 billion years",born:"Formed in Saturn's circumplanetary disk.",death:"Its methane cycle and atmosphere will evolve; no sudden death is known.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"A complex ice-rock moon that retained a dense atmosphere and surface lakes/seas of methane and ethane.",contribution:"The only moon known with a thick atmosphere and stable surface lakes/seas; a major prebiotic-chemistry laboratory."},
+Enceladus:{number:"Natural satellite — no asteroid number",discoveryTelescope:"William Herschel's 40-foot reflector, 1789",gravity:"0.113 m/s² (~0.012 g)",atmosphere:"Very thin water-vapor-rich plume/exosphere; vastly below Earth",gases:"H₂O vapor plus CO₂, NH₃ and other plume species",age:"~4.5 billion years",born:"Formed in Saturn's circumplanetary disk.",death:"Plume activity may wax and wane; no known sudden death.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Small icy moon heated by tidal interactions with Saturn.",contribution:"Its south-polar plumes provide direct access to material from a subsurface ocean."},
+Mimas:{number:"Natural satellite — no asteroid number",discoveryTelescope:"William Herschel's 40-foot reflector, 1789",gravity:"0.064 m/s² (~0.0065 g)",atmosphere:"Essentially none",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Formed in Saturn's satellite system.",death:"Long-term surface evolution is dominated by impacts and tidal processes.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Small icy Saturnian moon.",contribution:"Its Herschel crater provides a striking record of giant impacts in the Saturnian system."},
+Iapetus:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Giovanni Cassini's telescope, 1671",gravity:"0.223 m/s² (~0.023 g)",atmosphere:"Essentially none",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Formed in Saturn's circumplanetary disk.",death:"No sudden death known; long-term impacts continue to modify its surface.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Distant Saturnian moon with dramatic light/dark hemispheres and an equatorial ridge.",contribution:"A unique example of surface-color dichotomy and large-scale ridge formation on an icy moon."},
+Rhea:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Giovanni Cassini's telescope, 1672",gravity:"0.264 m/s² (~0.027 g)",atmosphere:"Extremely thin exosphere",gases:"O₂ and CO₂ detected in the exosphere",age:"~4.5 billion years",born:"Formed in Saturn's circumplanetary disk.",death:"No known sudden death; long-term impacts and orbital interactions continue.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Large icy-rock Saturnian moon.",contribution:"Useful for understanding radiation-driven surface chemistry on airless icy worlds."},
+Titania:{number:"Natural satellite — no asteroid number",discoveryTelescope:"William Herschel's reflecting telescope, 1787",gravity:"0.379 m/s² (~0.039 g)",atmosphere:"No substantial atmosphere; extremely thin exosphere",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Formed in Uranus' circumplanetary disk.",death:"No sudden death known; future evolution is dominated by impacts and solar-system evolution.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Largest Uranian moon, built from ice and rock.",contribution:"Helps reveal the geology and thermal history of the poorly explored Uranian satellite system."},
+Oberon:{number:"Natural satellite — no asteroid number",discoveryTelescope:"William Herschel's reflecting telescope, 1787",gravity:"~0.35 m/s² (~0.036 g)",atmosphere:"No substantial atmosphere",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Formed in Uranus' circumplanetary disk.",death:"No sudden death known; long-term impacts dominate.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Outer large moon of Uranus.",contribution:"Preserves a cold, ancient impact record in the Uranian system."},
+Umbriel:{number:"Natural satellite — no asteroid number",discoveryTelescope:"William Herschel's reflecting telescope, 1851",gravity:"~0.23 m/s²",atmosphere:"No substantial atmosphere",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Formed in Uranus' circumplanetary disk.",death:"No known sudden death.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Dark icy moon of Uranus.",contribution:"Shows how ancient icy surfaces can retain enormous impact and tectonic scars."},
+Ariel:{number:"Natural satellite — no asteroid number",discoveryTelescope:"William Lassell's reflecting telescope, 1851",gravity:"~0.27 m/s²",atmosphere:"No substantial atmosphere",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Formed in Uranus' circumplanetary disk.",death:"No known sudden death.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Bright, geologically fractured inner Uranian moon.",contribution:"Its valleys and tectonic features record interior and tidal evolution."},
+Miranda:{number:"Natural satellite — no asteroid number",discoveryTelescope:"McDonald Observatory 82-inch reflector, 1948",gravity:"~0.079 m/s²",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Formed in Uranus' circumplanetary disk; heavily reworked by ancient tectonics and impacts.",death:"No sudden death known.",spinDirection:"Prograde — west-to-east; tidally locked",formation:"Small Uranian moon with enormous fault systems and mixed terrain.",contribution:"A natural laboratory for understanding how small icy worlds can be intensely resurfaced."},
+Triton:{number:"Natural satellite — no asteroid number",discoveryTelescope:"William Lassell's 24-inch reflector, 1846",gravity:"0.779 m/s² (~0.079 g)",atmosphere:"Very thin, seasonal N₂ atmosphere; far below Earth",gases:"Mostly N₂ with traces of CH₄ and other hydrocarbons",age:"~4.5 billion years",born:"Likely a captured Kuiper Belt object, not formed in Neptune's original disk.",death:"Long-term tidal evolution may bring Triton inward; eventual disruption or collision with Neptune/rings is possible on a very long timescale.",spinDirection:"Prograde rotation, but retrograde orbit around Neptune; tidally locked",formation:"Captured outer-solar-system body reshaped by tidal heating.",contribution:"One of the best natural examples of a captured Kuiper Belt world and active volatile geology."},
+Proteus:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Voyager 2 imaging system, 1989",gravity:"~0.02 m/s²",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Formed in the Neptunian system.",death:"No known sudden death; long-term impacts can fragment it.",spinDirection:"Prograde — likely tidally locked",formation:"Dark irregular inner moon of Neptune.",contribution:"Provides evidence about the small-moon population created and preserved around Neptune."},
+Nereid:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Gerard Kuiper using the 82-inch reflector, 1949",gravity:"Very low",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Likely formed in the early Neptunian system; its highly eccentric orbit suggests complex dynamical history.",death:"Long-term orbital evolution is possible; no near-term death known.",spinDirection:"Unknown / not well measured",formation:"Irregular Neptunian moon with a very eccentric orbit.",contribution:"Its extreme orbit is important for understanding Neptune's past gravitational evolution."},
+Larissa:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Ground-based stellar occultation; later confirmed by Voyager 2, 1989",gravity:"Very low",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Formed/accreted in Neptune's satellite system.",death:"No sudden death known.",spinDirection:"Prograde — tidally locked",formation:"Inner irregularly shaped Neptunian moon.",contribution:"Helps constrain the structure and dynamics of Neptune's inner moons and ring system."},
+Despina:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Voyager 2 imaging system, 1989",gravity:"Very low",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Formed in Neptune's inner satellite system.",death:"May eventually interact dynamically with Neptune's ring system; no precise fate date.",spinDirection:"Prograde — tidally locked",formation:"Tiny inner moon that helps shape Neptune's ring arcs.",contribution:"A shepherd-like moon whose gravity helps structure Neptune's inner rings."},
+Charon:{number:"Natural satellite — no asteroid number",discoveryTelescope:"U.S. Naval Observatory 1.55 m reflector, 1978",gravity:"~0.29 m/s² (~0.03 g)",atmosphere:"No substantial atmosphere",gases:"Trace exosphere, no stable Earth-like atmosphere",age:"~4.5 billion years",born:"Likely formed through a giant impact involving Pluto and a companion body.",death:"Remains in a stable mutual orbit; long-term evolution follows the Pluto system and solar-system changes.",spinDirection:"Prograde — west-to-east; tidally locked to Pluto",formation:"The largest Pluto moon and part of a binary dwarf-planet system.",contribution:"Provides a major example of a binary planetary system and helps reveal Pluto's mass and interior evolution."},
+Nix:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Hubble Space Telescope, 2005",gravity:"Very low",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Likely formed from debris in the Pluto-Charon impact environment.",death:"No known sudden death.",spinDirection:"Chaotic/tumbling",formation:"Small irregular Pluto-Charon system moon.",contribution:"Its chaotic spin helps scientists understand the complex dynamics of circumbinary moon systems."},
+Hydra:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Hubble Space Telescope, 2005",gravity:"Very low",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Likely formed from debris generated by the Pluto-Charon collision.",death:"No known sudden death.",spinDirection:"Chaotic/tumbling",formation:"Outer small moon of Pluto.",contribution:"Helps constrain the formation of Pluto's compact satellite system."},
+Kerberos:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Hubble Space Telescope, 2011",gravity:"Very low",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Likely collision-debris origin in the Pluto-Charon system.",death:"No known sudden death.",spinDirection:"Chaotic/tumbling",formation:"Small double-lobed moon between Nix and Hydra.",contribution:"Adds another constraint on the orbital architecture of the Pluto-Charon system."},
+Styx:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Hubble Space Telescope, 2012",gravity:"Very low",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Likely formed from Pluto-Charon impact debris.",death:"No known sudden death.",spinDirection:"Chaotic/tumbling",formation:"Small outer moon of Pluto.",contribution:"Helped planners assess the hazard environment for New Horizons."},
+"Hiʻiaka":{number:"Natural satellite — no asteroid number",discoveryTelescope:"Ground-based imaging by the Caltech discovery team, 2005",gravity:"Very low",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Likely formed from debris created by an ancient Haumea collision.",death:"No known sudden death.",spinDirection:"Prograde orbit; spin not well constrained",formation:"Outer moon of Haumea.",contribution:"Supports the idea of a Haumea collisional family."},
+Namaka:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Ground-based imaging by the Caltech discovery team, 2005",gravity:"Very low",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Likely formed from Haumea impact debris.",death:"No known sudden death.",spinDirection:"Prograde orbit; spin not well constrained",formation:"Inner moon of Haumea.",contribution:"Helps reconstruct the dynamical history of the Haumea system."},
+Dysnomia:{number:"Natural satellite — no asteroid number",discoveryTelescope:"Keck Observatory imaging, 2005",gravity:"Very low",atmosphere:"None",gases:"No stable atmosphere",age:"~4.5 billion years",born:"Likely formed with or through a major collision affecting Eris.",death:"No known sudden death.",spinDirection:"Likely tidally locked; spin not directly measured",formation:"Eris' only known moon.",contribution:"Its orbit is crucial for measuring Eris' mass and density."
+}
+};
+
+for(const [name,patchEntry] of Object.entries(objectSpecificScience)){
+  bodies[name]={...(bodies[name]||{}),...defaultMoonScience,...patchEntry};
+}
+for(const name of Object.keys(bodies)){
+  if(!bodies[name].gravity){
+    bodies[name]={...defaultMoonScience,...bodies[name]};
+  }
+}
+
+
+
+/* Genuine ISRO images only. No invented “ISRO” attribution. */
+bodies.Earth.isroImage={
+  url:"https://commons.wikimedia.org/wiki/Special:FilePath/India_as_seen_by_Mars_Colour_Camera_%28MCC%29_during_the_Mars_Orbiter_Mission_%28MOM%29_journey_towards_Mars.png",
+  title:"India as seen by Mars Colour Camera",
+  agency:"ISRO",
+  instrument:"Mars Colour Camera (MCC) on Mars Orbiter Mission",
+  date:"2013",
+  reason:"Captured by MOM's MCC during the spacecraft's journey toward Mars; this is the requested Earth view showing India."
+};
+bodies.Mars.isroImage={
+  url:"https://upload.wikimedia.org/wikipedia/commons/0/0e/Mars_Orbiter_Mission_-_Mars_Full_Disk.jpg",
+  title:"Mars Full Disk from MOM",
+  agency:"ISRO",
+  instrument:"Mars Colour Camera (MCC)",
+  date:"2014",
+  reason:"MOM's Mars Colour Camera produced full-disk color views of Mars and monitored the Martian surface and atmosphere."
+};
+bodies.Phobos.isroImage={
+  url:"https://www.isro.gov.in/phobos.html",
+  title:"Phobos imaged by MOM",
+  agency:"ISRO",
+  instrument:"Mars Colour Camera (MCC)",
+  date:"July (MOM mission)",
+  reason:"MCC imaged Phobos from the Mars Orbiter Mission; the official ISRO page documents the observation."
+};
+bodies.Moon.isroImage={
+  url:"https://commons.wikimedia.org/wiki/Special:FilePath/Chandrayaan-3_landing_site.jpg",
+  title:"Chandrayaan-3 landing site",
+  agency:"ISRO",
+  instrument:"Chandrayaan-3 imagery",
+  date:"2023",
+  reason:"Officially associated with India's Chandrayaan-3 lunar landing."
+};
+
+function createVisual(type){
+if(type==="sun")return '<div class="big-sun" style="width:125px;height:125px"></div>';
+if(type==="asteroid")return '<div class="asteroid"></div>';
+if(type==="moon")return '<div class="moon-vis"></div>';
+return `<div class="planet ${type}"></div>`;
+}
+
+async function getBestObjectImage(name){
+  const b=bodies[name]||{};
+  const list=Array.isArray(b.images)?b.images.filter(Boolean):[];
+  // Prefer the first stored image, then use NASA's public archive as a fallback.
+  for(const item of list){
+    if(!item.url) continue;
+    try{
+      const ok=await new Promise(resolve=>{
+        const im=new Image();
+        im.onload=()=>resolve(true);
+        im.onerror=()=>resolve(false);
+        im.src=item.url;
+      });
+      if(ok) return item;
+    }catch(e){}
+  }
+  const results=await searchNASAImages(name);
+  if(results[0]) return {
+    url:results[0].url,
+    title:results[0].title||name,
+    agency:'NASA',
+    telescope:results[0].center||'NASA archive',
+    date:results[0].date_created?results[0].date_created.slice(0,10):'Not specified',
+    reason:'Matched automatically from NASA\'s public image archive.'
+  };
+  return null;
+}
+
+async function showFeaturedObjectImage(name){
+  const holder=document.getElementById('modalPlanet');
+  const b=bodies[name]||{};
+  holder.innerHTML=createVisual(b.visual);
+  const item=await getBestObjectImage(name);
+  // Modal may have been closed/reopened for another object while loading.
+  if(document.getElementById('modalTitle').textContent!==String(name)) return;
+  if(item && item.url){
+    const img=document.createElement('img');
+    img.alt=String(name)+' image';
+    img.referrerPolicy='no-referrer';
+    img.src=item.url;
+    img.onerror=()=>{ img.remove(); };
+    holder.innerHTML='';
+    holder.appendChild(img);
+  }
+}
+
+/* ===== Wonder-specific content; uses the existing modal only ===== */
+const wonders={
+  "Olympus Mons":{
+    category:"Wonder • Largest known volcano in the Solar System",
+    discoverer:"Detailed spacecraft mapping by NASA Viking Orbiter 1; identified as a giant Martian volcano from planetary observations",
+    date:"Detailed Viking observations: 1970s",
+    size:"~27 km high; >600 km across at the base",
+    life:"Not a known habitat; importance is geological",
+    details:"Olympus Mons is a gigantic shield volcano in Mars' Tharsis region. It rises roughly 27 km above the surrounding plains and spreads more than 600 km across. Its immense size is associated with Mars' lower gravity and the absence of Earth-style moving tectonic plates over the volcano, allowing lava flows to build up the same volcanic center repeatedly.",
+    formation:"Repeated basaltic eruptions built broad overlapping lava flows over ancient Martian geological time.",
+    significance:"It is the largest known volcano in the Solar System and a major example of planetary volcanism, gravity and crustal evolution.",
+    location:"Tharsis region, Mars",
+    query:"Olympus Mons NASA Mars Viking MRO"
+  },
+  "South Pole-Aitken Basin":{
+    category:"Wonder • Largest impact basin on the Moon",
+    discoverer:"Characterized through lunar spacecraft mapping; detailed topography from NASA lunar missions",
+    date:"Modern spacecraft mapping era",
+    size:"~2,500–2,600 km across; more than 8 km deep in places",
+    life:"No known life; scientific importance is geological",
+    details:"The South Pole-Aitken (SPA) Basin occupies a huge region on the Moon's far side. NASA describes it as the largest impact basin on the Moon and one of the largest and oldest impact features in the Solar System. Its enormous depth makes it especially valuable for studying material excavated from deep within the Moon.",
+    formation:"Created by an enormous ancient impact that excavated and displaced vast amounts of lunar crust.",
+    significance:"It is a major target for lunar science because deep material exposed by the impact can reveal information about the Moon's early crust and interior.",
+    location:"Moon's far side, between the lunar south pole and Aitken crater",
+    query:"South Pole Aitken Basin NASA Moon"
+  },
+  "Mercury Surface":{
+    category:"Wonder • Ancient heavily cratered planetary surface",
+    discoverer:"Mercury was known since antiquity; detailed mapping came from Mariner 10 and MESSENGER",
+    date:"Detailed global MESSENGER mapping: 2011–2015",
+    size:"Ancient cratered terrain across Mercury; Caloris Basin is ~1,550 km across",
+    life:"No known life; the surface is extremely hostile",
+    details:"Mercury preserves an exceptionally ancient crater record. With essentially no substantial atmosphere to erase impact scars, numerous craters and basins remain visible. The surface records the intense bombardment that affected the inner Solar System during its early history.",
+    formation:"Impacts accumulated through Mercury's early history; later volcanic and tectonic processes modified some regions while leaving much ancient terrain intact.",
+    significance:"Mercury's crater record provides a valuable geological benchmark for comparing the early histories of rocky worlds.",
+    location:"Across Mercury, especially its ancient cratered terrain",
+    query:"Mercury cratered surface NASA MESSENGER"
+  },
+  "Great Red Spot":{
+    category:"Wonder • Giant atmospheric storm on Jupiter",
+    discoverer:"Observed telescopically for centuries; detailed spacecraft observations came from Voyager and Juno",
+    date:"Historic telescopic observations; major Juno investigations in the 2010s–2020s",
+    size:"A giant anticyclonic vortex thousands of kilometres across",
+    life:"Not applicable — atmospheric storm",
+    details:"The Great Red Spot is a huge, long-lived anticyclonic storm in Jupiter's atmosphere. NASA's Juno mission found that its vortex reaches hundreds of kilometres below the visible cloud tops. Its color and dimensions change over time, while powerful winds keep the storm organized.",
+    formation:"A large atmospheric vortex maintained by Jupiter's powerful jet streams and rapidly rotating hydrogen-helium atmosphere; its full longevity mechanism is still studied.",
+    significance:"It is a natural laboratory for understanding giant-planet weather, deep atmospheric circulation and the transfer of energy between cloud layers.",
+    location:"Jupiter's southern hemisphere",
+    query:"Jupiter Great Red Spot NASA Juno Hubble"
+  }
+};
+
+async function openWonder(name){
+  const w=wonders[name]; if(!w)return;
+  document.getElementById("modalTitle").textContent=name;
+  document.getElementById("modalCategory").textContent=w.category;
+  document.getElementById("modalDiscoverer").textContent=w.discoverer;
+  document.getElementById("modalDate").textContent=w.date;
+  document.getElementById("modalSize").textContent=w.size;
+  document.getElementById("modalLife").textContent=w.life;
+  document.getElementById("modalRot").textContent="Not applicable — this is a wonder/feature";
+  document.getElementById("modalRev").textContent="Not applicable — this is a wonder/feature";
+  document.getElementById("modalNumber").textContent="Not applicable — wonder/feature, not a separate astronomical body";
+  document.getElementById("modalDiscoveryTelescope").textContent=w.discoverer;
+  document.getElementById("modalGravity").textContent="Not applicable to the feature itself";
+  document.getElementById("modalAtmosphere").textContent="Not applicable to the feature itself";
+  document.getElementById("modalGases").textContent="Not applicable to the feature itself";
+  document.getElementById("modalAge").textContent="Ancient feature; exact formation age is under study";
+  document.getElementById("modalBorn").textContent=w.formation;
+  document.getElementById("modalDeath").textContent="No separate death date; it changes through geological or atmospheric processes.";
+  document.getElementById("modalSpinDirection").textContent="Not applicable to this feature";
+  document.getElementById("modalFormationContribution").textContent=w.formation+" "+w.significance;
+  document.getElementById("modalCharacteristics").textContent=w.details+" Location: "+w.location+".";
+  document.getElementById("modalPlanet").innerHTML=createVisual(name==="Olympus Mons"?"mars":name==="Mercury Surface"?"mercury":name==="Great Red Spot"?"jupiter":"moon");
+  document.getElementById("moonsBox").style.display="none";
+  document.getElementById("extraScienceGrid").style.display="none";
+  document.getElementById("viewerSubtitle").textContent="Many images of this wonder. The information shown above and below describes the wonder itself, not the entire planet or Moon.";
+  document.getElementById("globeTab").style.display="none";
+  document.getElementById("mapTab").style.display="none";
+  document.getElementById("sizeTab").style.display="none";
+  document.getElementById("globeControls").style.display="none";
+  document.getElementById("imageTab").style.display="inline-block";
+  document.getElementById("modal").classList.add("show");
+  document.body.style.overflow="hidden";
+  showViewer("image");
+  document.getElementById("imageStage").innerHTML='<div class="gallery-item"><div class="gallery-info"><h4>📸 Loading wonder images…</h4><p>Finding multiple NASA images specifically related to '+escapeHtml(name)+'.</p></div></div>';
+  const items=await searchNASAImages(w.query,8);
+  if(document.getElementById("modalTitle").textContent!==name)return;
+  const stage=document.getElementById("imageStage");
+  stage.innerHTML="";
+  if(!items.length){stage.innerHTML='<div class="gallery-item"><div class="image-unavailable"><div><strong>Images not available right now</strong><div>No matching online NASA images could be loaded for this wonder.</div></div></div></div>';return;}
+  items.slice(0,8).forEach(item=>{
+    const div=document.createElement("div");div.className="gallery-item";
+    div.innerHTML='<img class="gallery-img" src="'+escapeHtml(item.url)+'" alt="'+escapeHtml(item.title)+'"><div class="gallery-info"><h4>'+escapeHtml(item.title)+'</h4><p><strong>Agency:</strong> '+escapeHtml(item.center||"NASA")+'</p><p><strong>Date:</strong> '+escapeHtml(item.date_created?item.date_created.slice(0,10):"Not specified")+'</p>'+(item.photographer?'<p><strong>Creator/Photographer:</strong> '+escapeHtml(item.photographer)+'</p>':'')+(item.description?'<p><strong>About this image:</strong> '+escapeHtml(item.description.slice(0,1000))+'</p>':'')+'</div>';
+    stage.appendChild(div);
+  });
+}
+
+function restoreObjectView(){
+  document.getElementById("globeTab").style.display="inline-block";
+  document.getElementById("mapTab").style.display="inline-block";
+  document.getElementById("sizeTab").style.display="inline-block";
+  document.getElementById("extraScienceGrid").style.display="grid";
+}
+
+function openBody(name){
+const b=bodies[name];if(!b)return;
+restoreObjectView();
+document.getElementById("modalTitle").textContent=name;
+document.getElementById("modalCategory").textContent=b.category;
+document.getElementById("modalDiscoverer").textContent=b.discoverer;
+document.getElementById("modalDate").textContent=b.date;
+document.getElementById("modalSize").textContent=b.size;
+document.getElementById("modalLife").textContent=b.life;
+document.getElementById("modalRot").textContent=b.rot || "Unknown";
+document.getElementById("modalRev").textContent=b.rev || "Unknown";
+document.getElementById("modalCharacteristics").textContent=b.characteristics;
+document.getElementById("modalNumber").textContent=b.number || "Not applicable";
+document.getElementById("modalDiscoveryTelescope").textContent=b.discoveryTelescope || "Not specified";
+document.getElementById("modalGravity").textContent=b.gravity || "Not available";
+document.getElementById("modalAtmosphere").textContent=b.atmosphere || "Not available";
+document.getElementById("modalGases").textContent=b.gases || "Not available";
+document.getElementById("modalAge").textContent=b.age || "About 4.5–4.6 billion years";
+document.getElementById("modalBorn").textContent=b.born || "Early solar-system formation";
+document.getElementById("modalDeath").textContent=b.death || "No specific scientific death date is known";
+document.getElementById("modalSpinDirection").textContent=b.spinDirection || (b.dir<0 ? "Retrograde — east-to-west" : "Prograde — west-to-east");
+document.getElementById("modalFormationContribution").textContent=(b.formation||"") + " " + (b.contribution||"");
+document.getElementById("modalPlanet").innerHTML=createVisual(b.visual);
+showFeaturedObjectImage(name);
+
+const moonsBox = document.getElementById("moonsBox");
+const modalMoons = document.getElementById("modalMoons");
+if(b.moons && b.moons.length > 0){
+  moonsBox.style.display="block";
+  modalMoons.innerHTML="";
+  b.moons.forEach(m=>{
+    let btn=document.createElement("button");
+    btn.className="moon-btn";
+    btn.textContent=m;
+    btn.onclick = () => openBody(m);
+    modalMoons.appendChild(btn);
+  });
+} else {
+  moonsBox.style.display="none";
+}
+
+setViewerBody(name);
+showViewer("globe");
+document.getElementById("modal").classList.add("show");
+document.body.style.overflow="hidden";
+}
+
+function closeModal(){document.getElementById("modal").classList.remove("show");document.body.style.overflow="";stopSpin();restoreObjectView();}
+document.getElementById("modal").addEventListener("click",e=>{if(e.target===e.currentTarget)closeModal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
+
+const viewerData={
+  Sun:{texture:"https://edu.solarsystemscope.com/textures/download/2k_sun.jpg",diameter:1392680,textureType:"Sun surface texture",visualClass:"sun-globe"},
+  Mercury:{texture:"https://edu.solarsystemscope.com/textures/download/2k_mercury.jpg",diameter:4879,textureType:"Surface map"},
+  Venus:{texture:"https://edu.solarsystemscope.com/textures/download/2k_venus_surface.jpg",diameter:12104,textureType:"Surface map"},
+  Earth:{texture:"https://edu.solarsystemscope.com/textures/download/2k_earth_daymap.jpg",diameter:12756,textureType:"Earth day map"},
+  Moon:{texture:"https://edu.solarsystemscope.com/textures/download/2k_moon.jpg",diameter:3474,textureType:"Lunar surface map"},
+  Mars:{texture:"https://edu.solarsystemscope.com/textures/download/2k_mars.jpg",diameter:6792,textureType:"Surface map"},
+  Phobos:{texture:"https://upload.wikimedia.org/wikipedia/commons/5/5d/Phobos_map_PIA16249.jpg",diameter:22,textureType:"Photographic surface map"},
+  Deimos:{texture:"https://upload.wikimedia.org/wikipedia/commons/8/8d/Deimos_map_PIA16254.jpg",diameter:12,textureType:"Photographic surface map"},
+  Jupiter:{texture:"https://edu.solarsystemscope.com/textures/download/2k_jupiter.jpg",diameter:142984,textureType:"Atmospheric map"},
+  Io:{texture:"https://upload.wikimedia.org/wikipedia/commons/3/36/Io_map_USGS.jpg",diameter:3642,textureType:"Surface map"},
+  Europa:{texture:"https://upload.wikimedia.org/wikipedia/commons/5/5e/Europa_map.jpg",diameter:3121,textureType:"Surface map"},
+  Ganymede:{texture:"https://upload.wikimedia.org/wikipedia/commons/0/05/Ganymede_map.jpg",diameter:5268,textureType:"Surface map"},
+  Callisto:{texture:"https://upload.wikimedia.org/wikipedia/commons/2/21/Callisto_map.jpg",diameter:4820,textureType:"Surface map"},
+  Saturn:{texture:"https://edu.solarsystemscope.com/textures/download/2k_saturn.jpg",diameter:120536,textureType:"Atmospheric map"},
+  Titan:{texture:"https://upload.wikimedia.org/wikipedia/commons/4/4d/Titan_map.jpg",diameter:5149,textureType:"Infrared surface map"},
+  Enceladus:{texture:"https://upload.wikimedia.org/wikipedia/commons/8/87/Enceladus_map.jpg",diameter:504,textureType:"Surface map"},
+  Mimas:{texture:"https://upload.wikimedia.org/wikipedia/commons/e/ec/Mimas_map.jpg",diameter:396,textureType:"Surface map"},
+  Iapetus:{texture:"https://upload.wikimedia.org/wikipedia/commons/4/4e/Iapetus_map.jpg",diameter:1469,textureType:"Surface map"},
+  Rhea:{texture:"https://upload.wikimedia.org/wikipedia/commons/5/53/Rhea_map.jpg",diameter:1527,textureType:"Surface map"},
+  Uranus:{texture:"https://edu.solarsystemscope.com/textures/download/2k_uranus.jpg",diameter:51118,textureType:"Atmospheric map"},
+  Neptune:{texture:"https://edu.solarsystemscope.com/textures/download/2k_neptune.jpg",diameter:49528,textureType:"Atmospheric map"},
+  Triton:{texture:"https://upload.wikimedia.org/wikipedia/commons/a/a6/Triton_map.jpg",diameter:2706,textureType:"Surface map"},
+  Ceres:{texture:"https://edu.solarsystemscope.com/textures/download/2k_ceres.jpg",diameter:964,textureType:"Surface map"},
+  Pluto:{texture:"https://science.nasa.gov/wp-content/uploads/2023/04/pluto.jpg",diameter:2377,textureType:"Photographic surface map"},
+  Charon:{texture:"https://upload.wikimedia.org/wikipedia/commons/d/df/Charon_map.jpg",diameter:1212,textureType:"Photographic surface map"},
+  Haumea:{texture:"https://edu.solarsystemscope.com/textures/download/2k_haumea.jpg",diameter:1740,textureType:"Illustrative surface texture"},
+  Makemake:{texture:"https://edu.solarsystemscope.com/textures/download/2k_makemake.jpg",diameter:1434,textureType:"Illustrative surface texture"},
+  Eris:{texture:"https://edu.solarsystemscope.com/textures/download/2k_eris.jpg",diameter:2326,textureType:"Illustrative surface texture"}
+};
+Object.keys(viewerData).forEach(k=>{
+  const d=viewerData[k];
+  if(!d||!d.texture)return;
+  const t=String(d.textureType||"").toLowerCase();
+  d.map=/surface map|earth day map|lunar surface map|atmospheric map/.test(t)?d.texture:null;
+});
+
+// Keep the original viewer URLs wherever they already exist.
+// Add a gentle moon/asteroid fallback so every catalogued object still gets a spherical viewer.
+for(const [name,b] of Object.entries(bodies)){
+  if(!viewerData[name]){
+    viewerData[name]={
+      texture:"",
+      diameter:parseInt(String(b.size||"100").replace(/[^0-9]/g,""),10) || 100,
+      textureType:"NASA image / globe texture",
+      visualClass:""
+    };
+  }
+}
+
+let currentViewerBody="Earth";
+let globeOffsetX=0;
+let globeOffsetY=50;
+let globeZoom=1;
+let spinning=true;
+let spinTimer=null;
+
+async function setViewerBody(name){
+  currentViewerBody=name;
+  const globe=document.getElementById("realGlobe");
+  const map=document.getElementById("surfaceMap");
+  const notice=document.getElementById("mapNotice");
+  const b=bodies[name]||{};
+  document.getElementById("imageTab").style.display="inline-block";
+  buildImageGallery(b.images||[],name);
+  let d=viewerData[name];
+  if(!d || !d.texture){
+    const result=await searchNASAImages(name,6);
+    if(result[0]?.url){
+      d=viewerData[name]=d||{};
+      d.texture=result[0].url;
+      d.diameter=parseInt(String(b.size||"100").replace(/[^0-9]/g,""),10)||100;
+      d.textureType="NASA image used as available globe imagery";
+      d.map=null;
+    }
+  }
+  if(d&&d.texture){
+    globe.style.backgroundImage=`url("${d.texture.replace(/"/g,'&quot;')}")`;
+    globe.className="globe"+(d.visualClass?" "+d.visualClass:"");
+    document.getElementById("viewerSubtitle").textContent=`${d.textureType||"Available surface imagery"} • Diameter: ${(d.diameter||0).toLocaleString()} km`;
+  }else{
+    globe.style.backgroundImage="";
+    document.getElementById("viewerSubtitle").textContent=`No online image is available for ${name} right now`;
+  }
+  const hasMap=!!(d&&d.map);
+  if(hasMap){
+    map.style.display="block";notice.style.display="none";map.src=d.map;map.alt=name+" 2D surface map";
+    map.onerror=()=>{map.style.display="none";notice.style.display="block";notice.innerHTML="<strong>2D map not available</strong><br>The dedicated 2D map could not be loaded from the internet.";};
+  }else{
+    map.removeAttribute("src");map.style.display="none";notice.style.display="block";notice.innerHTML=`<strong>2D map not available</strong><br>A dedicated online 2D map is not available for ${escapeHtml(name)}.`;
+  }
+  resetGlobe();buildSizePanel(name);
+}
+
+function resetGlobe(){
+  globeOffsetX=0;
+  globeOffsetY=50;
+  globeZoom=1;
+  updateGlobeTransform();
+}
+
+function zoomGlobe(val){
+  globeZoom += val;
+  if(globeZoom < 1) globeZoom = 1;
+  if(globeZoom > 4) globeZoom = 4;
+  updateGlobeTransform();
+}
+
+function updateGlobeTransform(){
+  const globe=document.getElementById("realGlobe");
+  globe.style.backgroundPosition=`${globeOffsetX}px ${globeOffsetY}%`;
+  globe.style.transform=`scale(${globeZoom})`;
+}
+
+function toggleSpin(){
+  spinning=!spinning;
+  if(spinning) startSpin(); else stopSpin();
+}
+
+function startSpin(){
+  stopSpin();
+  spinTimer=setInterval(()=>{
+    if(document.getElementById("globeStage").style.display==="none")return;
+    const dir = bodies[currentViewerBody]?.dir || 1;
+    globeOffsetX += (0.35 * dir); 
+    updateGlobeTransform();
+  },30);
+}
+function stopSpin(){if(spinTimer){clearInterval(spinTimer);spinTimer=null}}
+
+function showViewer(mode){
+  const stages={globe:"globeStage",map:"mapStage",size:"sizeStage",image:"imageStage"};
+  Object.values(stages).forEach(id=>document.getElementById(id).style.display="none");
+  document.getElementById(stages[mode]).style.display=(mode==="size"||mode==="image")?"grid":"flex";
+  document.querySelectorAll(".viewer-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById(mode==="globe"?"globeTab":mode==="map"?"mapTab":mode==="size"?"sizeTab":"imageTab").classList.add("active");
+  document.getElementById("globeControls").style.display=mode==="globe"?"flex":"none";
+  if(mode==="globe" && spinning)startSpin();
+}
+
+function buildSizePanel(selected){
+  const panel=document.getElementById("sizePanel");
+  panel.innerHTML="";
+  const max=1392680;
+  
+  const order=Object.entries(viewerData).sort((a,b)=>b[1].diameter-a[1].diameter).map(x=>x[0]);
+  let names=[selected,...order.filter(n=>n!==selected)].slice(0,14);
+
+  names.forEach(name=>{
+    const d=viewerData[name]?.diameter;
+    if(!d)return;
+    const row=document.createElement("div");
+    row.className="size-row";
+    const width=Math.max(0.6,Math.sqrt(d/max)*100);
+    row.innerHTML=`<strong>${name}</strong><div class="size-bar"><div class="size-fill" style="width:${Math.min(100,width)}%"></div></div><span class="size-label">${d.toLocaleString()} km</span>`;
+    panel.appendChild(row);
+  });
+}
+
+async function buildImageGallery(images, bodyName=currentViewerBody){
+  const stage=document.getElementById("imageStage");
+  stage.innerHTML=`<div class="gallery-item"><div class="gallery-info"><h4>📸 Loading images…</h4><p>Finding available images for ${escapeHtml(bodyName)}.</p></div></div>`;
+  const stored=Array.isArray(images)?images.filter(Boolean):[];
+  const nasa=await searchNASAImages(bodyName,8);
+  const combined=[]; const seen=new Set();
+  const add=item=>{if(item&&item.url&&!seen.has(item.url)){seen.add(item.url);combined.push(item);}};
+  stored.forEach(add);
+  nasa.forEach(x=>add({url:x.url,title:x.title,agency:"NASA",telescope:x.center,date:x.date_created?x.date_created.slice(0,10):"Not specified",reason:x.description||"NASA public image archive."}));
+  add(bodies[bodyName]?.isroImage);
+  stage.innerHTML="";
+  if(!combined.length){stage.innerHTML=`<div class="gallery-item"><div class="image-unavailable"><div><strong>Image not available</strong><div>No online image could be loaded for ${escapeHtml(bodyName)}.</div></div></div></div>`;return;}
+  combined.slice(0,10).forEach(item=>{
+    const div=document.createElement("div");div.className="gallery-item";
+    div.innerHTML=`<img class="gallery-img" src="${escapeHtml(item.url)}" alt="${escapeHtml(item.title||bodyName)}"><div class="gallery-info"><h4>${escapeHtml(item.title||"Image")}</h4><p><strong>Agency:</strong> ${escapeHtml(item.agency||"NASA/public archive")}</p>${item.telescope?`<p><strong>Mission / Instrument:</strong> ${escapeHtml(item.telescope)}</p>`:""}<p><strong>Date:</strong> ${escapeHtml(item.date||"Not specified")}</p>${item.reason?`<p><strong>About this image:</strong> ${escapeHtml(item.reason.slice(0,1000))}</p>`:""}</div>`;
+    div.querySelector("img").addEventListener("error",e=>{const im=e.currentTarget;const box=document.createElement("div");box.className="image-unavailable";box.innerHTML=`<div><strong>Image not available</strong><div>This particular online image could not be loaded.</div></div>`;im.replaceWith(box);});
+    stage.appendChild(div);
+  });
+}
+
+function escapeHtml(value){
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[ch]));
+}
+
+function addSourceLine(div, item){
+  let p = div.querySelector(".nasa-source");
+  if(!p){
+    p=document.createElement("p");
+    p.className="nasa-source";
+    p.style.cssText="font-size:12px;color:#7f8da3;line-height:1.4";
+    div.querySelector(".gallery-info").appendChild(p);
+  }
+  p.innerHTML=`<strong>NASA archive:</strong> ${escapeHtml(item.title || "")}${item.date_created ? " • "+escapeHtml(item.date_created.slice(0,10)) : ""}`;
+}
+
+async function searchNASAImages(query,pageSize=6){
+  try{
+    const url="https://images-api.nasa.gov/search?"+new URLSearchParams({
+      q: query,
+      media_type:"image",
+      page_size:String(pageSize)
+    });
+    const response=await fetch(url);
+    if(!response.ok) throw new Error("NASA image search failed");
+    const data=await response.json();
+    const items=(data.collection && data.collection.items) || [];
+    const output=[];
+    for(const item of items){
+      const meta=(item.data && item.data[0]) || {};
+      const links=item.links || [];
+      const imageLink=links.find(x=>x.render==="image" || /\.(jpg|jpeg|png|webp)(\?|$)/i.test(x.href||""));
+      if(!imageLink || !imageLink.href) continue;
+      output.push({
+        url:imageLink.href,
+        title:meta.title || `${query} — NASA`,
+        description:meta.description || "",
+        date_created:meta.date_created || "",
+        center:meta.center || "NASA",
+        photographer:meta.photographer || meta.secondary_creator || ""
+      });
+      if(output.length>=3) break;
+    }
+    return output;
+  }catch(err){
+    console.warn("NASA image archive unavailable:",err);
+    return [];
+  }
+}
+
+function renderNASAResults(items, bodyName){
+  const stage=document.getElementById("imageStage");
+  if(!items.length){
+    stage.innerHTML=`
+      <div class="gallery-item">
+        <div class="gallery-info">
+          <h4>📷 Image not available right now</h4>
+          <p>No replacement image could be loaded. Check your internet connection and reopen the Famous Captures tab.</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  stage.innerHTML="";
+  items.forEach(item=>{
+    const div=document.createElement("div");
+    div.className="gallery-item";
+    div.innerHTML=`
+      <img class="gallery-img" src="${escapeHtml(item.url)}" alt="${escapeHtml(item.title)}">
+      <div class="gallery-info">
+        <h4>${escapeHtml(item.title)}</h4>
+        <p><strong>Agency:</strong> ${escapeHtml(item.center || "NASA")}</p>
+        <p><strong>Date:</strong> ${escapeHtml(item.date_created ? item.date_created.slice(0,10) : "Not specified")}</p>
+        ${item.photographer ? `<p><strong>Creator/Photographer:</strong> ${escapeHtml(item.photographer)}</p>` : ""}
+        ${item.description ? `<p><strong>Science/mission description:</strong> ${escapeHtml(item.description.slice(0,700))}</p>` : ""}
+        <p style="font-size:12px;color:#7f8da3">This replacement was found automatically in NASA's public image archive for <strong>${escapeHtml(bodyName)}</strong>.</p>
+      </div>`;
+    stage.appendChild(div);
+  });
+}
+
+const globe=document.getElementById("realGlobe");
+let dragging=false,lastX=0,lastY=0;
+globe.addEventListener("pointerdown",e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;globe.classList.add("dragging");globe.setPointerCapture(e.pointerId);stopSpin()});
+globe.addEventListener("pointermove",e=>{
+  if(!dragging)return;
+  const dx=e.clientX-lastX;
+  const dy=e.clientY-lastY;
+  lastX=e.clientX;
+  lastY=e.clientY;
+  globeOffsetX+=dx;
+  globeOffsetY+=(dy/2);
+  globeOffsetY=Math.max(0,Math.min(100,globeOffsetY));
+  updateGlobeTransform();
+});
+globe.addEventListener("pointerup",()=>{dragging=false;globe.classList.remove("dragging");if(spinning)startSpin()});
+globe.addEventListener("pointercancel",()=>{dragging=false;globe.classList.remove("dragging");if(spinning)startSpin()});
+
+const input=document.getElementById("searchInput"),results=document.getElementById("searchResults"),list=document.getElementById("resultList"),count=document.getElementById("resultCount");
+input.addEventListener("input",function(){
+const q=this.value.trim().toLowerCase();
+if(!q){results.classList.remove("active");list.innerHTML="";return}
+const found=Object.entries(bodies).filter(([name,b])=>(name+" "+b.category+" "+b.discoverer+" "+b.characteristics).toLowerCase().includes(q));
+results.classList.add("active");
+count.textContent=`${found.length} result${found.length===1?"":"s"} found for "${this.value}"`;
+list.innerHTML="";
+if(!found.length){list.innerHTML='<div class="no-results">No celestial body or information found. Try another search.</div>';return}
+found.forEach(([name,b])=>{
+  const div=document.createElement("div");
+  div.className="result";
+  div.dataset.bodyName=name;
+  div.innerHTML=`<strong>${name}</strong><span>${b.category}</span><p style="color:#9da8ba;margin-top:8px;line-height:1.5">${b.characteristics.substring(0,180)}${b.characteristics.length>180?"...":""}</p>`;
+  div.addEventListener("click",()=>openBody(div.dataset.bodyName));
+  list.appendChild(div);
+});
+});
+document.getElementById("clearSearch").onclick=()=>{input.value="";results.classList.remove("active");list.innerHTML="";input.focus()};
+input.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){
+    const query=input.value.trim().toLowerCase();
+    if(!query) return;
+    const exact=Object.keys(bodies).find(name=>name.toLowerCase()===query);
+    if(exact){openBody(exact);return;}
+    const first=list.querySelector(".result");
+    if(first) first.click();
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Mohd Akhlad</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255, 221, 87, .28), transparent 28%),
+        radial-gradient(circle at 85% 80%, rgba(119, 190, 255, .25), transparent 30%),
+        #f7f1e5;
+      color: #202020;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .paper {
+      width: min(680px, 100%);
+      position: relative;
+      padding: 48px 42px 42px;
+      background: #fffdf8;
+      border: 3px solid #202020;
+      box-shadow: 10px 10px 0 #202020;
+      transform: rotate(-.6deg);
+    }
+
+    .tape {
+      position: absolute;
+      width: 100px;
+      height: 27px;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%) rotate(2deg);
+      background: rgba(255, 218, 102, .8);
+      border: 1px solid rgba(0,0,0,.08);
+    }
+
+    .number {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(6rem, 20vw, 10rem);
+      line-height: .8;
+      letter-spacing: -8px;
+    }
+
+    .scribble {
+      display: inline-block;
+      margin: 22px 0 12px;
+      padding: 7px 12px;
+      background: #bde3ff;
+      border: 2px solid #202020;
+      font-size: .9rem;
+      font-weight: 800;
+      transform: rotate(-2deg);
+    }
+
+    h1 {
+      margin: 8px 0 12px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 7vw, 3.4rem);
+      line-height: 1;
+    }
+
+    p {
+      max-width: 540px;
+      margin: 0 0 24px;
+      color: #555;
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .back {
+      display: inline-block;
+      padding: 12px 18px;
+      color: #202020;
+      background: #ffe16b;
+      border: 3px solid #202020;
+      box-shadow: 5px 5px 0 #202020;
+      text-decoration: none;
+      font-weight: 800;
+      transform: rotate(.8deg);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .back:hover {
+      transform: translate(3px, 3px) rotate(.8deg);
+      box-shadow: 2px 2px 0 #202020;
+    }
+
+    .note {
+      position: absolute;
+      right: 25px;
+      bottom: 25px;
+      font-family: "Comic Sans MS", "Bradley Hand", cursive;
+      font-size: .95rem;
+      transform: rotate(5deg);
+    }
+
+    @media (max-width: 520px) {
+      .paper {
+        padding: 38px 25px 34px;
+        box-shadow: 7px 7px 0 #202020;
+      }
+
+      .number {
+        letter-spacing: -5px;
+      }
+
+      .note {
+        position: static;
+        margin-top: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="paper">
+    <div class="tape"></div>
+
+    <div class="number">404</div>
+
+    <span class="scribble">oops... wrong page</span>
+
+    <h1>Looks like you got lost.</h1>
+
+    <p>
+      This page doesn't exist — or maybe I moved it while I was experimenting.
+      Either way, there isn't anything here right now.
+    </p>
+
+    <a class="back" href="./index.html">← Take me home</a>
+
+    <div class="note">— Akhlad ✎</div>
+  </main>
+</body>
+</html>
